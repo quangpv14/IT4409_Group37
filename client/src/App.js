@@ -23,8 +23,9 @@ function App() {
           <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
         </Routes>
-        <Footer />
+
       </main>
+      <Footer />
     </AuthProvider>
   );
 }

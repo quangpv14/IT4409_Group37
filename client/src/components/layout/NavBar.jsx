@@ -13,7 +13,7 @@ export const NavBar = () => {
     const userRole = localStorage.getItem("userRole")
 
     return (
-        <nav className='navbar navbar-expand-lg bg-body-tertiary px-5 shadow mt-3 sticky-top'>
+        <nav className='navbar navbar-expand-lg bg-body-tertiary px-5 shadow p-1 sticky-top'>
             <div className='container-fluid'>
                 <Link to={"/"} className='navbar-brand'>
                     <span className='text-uppercase'>Booking.com</span>
@@ -26,19 +26,19 @@ export const NavBar = () => {
                 <div className='collapse navbar-collapse' id='navbarScroll'>
                     <ul className='navbar-nav me-auto my-2 my-lg-0 navbar-nav-srcoll'>
                         <li className='nav-item'>
-                            <NavLink className='nav-link' aria-current='page'>Hotels & Homes</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')} aria-current='page'>Hotels & Homes</NavLink>
                         </li>
 
                     </ul>
                     <ul className='d-flex navbar-nav'>
                         <li className='nav-item'>
-                            <NavLink className='nav-link'>About</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>About</NavLink>
                         </li>
                         <li className='nav-item'>
-                            <NavLink className='nav-link'>Contact</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
                         </li>
                         <li className='nav-item'>
-                            <NavLink className='nav-link'>Help & Support</NavLink>
+                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Help & Support</NavLink>
                         </li>
                         <li className='nav-item dropdown'>
                             <a className={`text-reset nav-link dropdown-toggle ${showAccount ? "show" : ""}`}

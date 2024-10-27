@@ -1,10 +1,18 @@
 body {
   min-height: 100vh;
-  padding-bottom: 50px;
+  /* padding-bottom: 50px; */
 }
 
 .card {
   opacity: 0.9;
+}
+
+a {
+  text-decoration: none;
+}
+
+main {
+  height: 100vh;
 }
 
 /* Navigation bar definitions */
@@ -39,6 +47,10 @@ body {
 
 .navbar-dark .navbar-nav .nav-link {
   color: rgb(25, 24, 24);
+}
+
+.active-link {
+  color: black;
 }
 
 .navbar-dark .navbar-brand {
@@ -202,7 +214,7 @@ h2 {
 
 .overlay-content {
   position: absolute;
-  top: 67%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
@@ -220,7 +232,7 @@ h2 {
 
 .header-banner {
   position: relative;
-  height: 500px;
+  height: 300px;
 }
 
 @media only screen and (max-width: 768px) {
