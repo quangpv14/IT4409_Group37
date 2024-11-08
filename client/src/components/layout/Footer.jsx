@@ -10,12 +10,12 @@ export const Footer = () => {
         <footer className="bg-light border-top py-4 rounded-3 bg-footer" style={{
             borderTop: '2px solid rgba(6, 148, 162, 1)'
         }}>
-            <Container style={{ maxWidth: '1500px' }}>
+            <Container>
                 <Row className="justify-content-between">
                     <Col md={4} className="mb-3">
                         <h5>
                             <Link to="/" className="text-decoration-none text-dark">
-                                <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg px-2 py-1 text-black">
+                                <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-black">
                                     Booking
                                 </span>
                                 .com

@@ -250,6 +250,7 @@ h2 {
 .bg-footer {
   background-color: rgb(42, 42, 46);
 }
+
 .footer {
   position: fixed;
   left: 0;
@@ -267,19 +268,25 @@ h2 {
   flex-direction: column;
 }
 
-.section-sign-in, .section-sign-up {
-  height: 93vh;
+.section-sign-in,
+.section-sign-up {
+  height: 100%;
   width: 100%;
   background-color: #f9f9f9;
 }
 
-.sign-up, .sign-in {
+.sign-up,
+.sign-in {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.content-sign-in{
+.content-sign-in {
+  padding: 70px 0px;
+}
+
+.content-sign-in {
   width: 40%;
   /* margin: 100px; */
   display: flex;
@@ -287,33 +294,38 @@ h2 {
   align-items: center;
 }
 
-.sign-in-container{
+.sign-in-container {
   padding: 16px 24px 24px;
   background-color: white;
-  height: 54%;
-  width: 70%;
+  height: 94%;
+  width: 80%;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
 .sign-up-container {
-  padding: 16px 24px 24px;
+  padding: 16px 24px 5px 24px;
   background-color: white;
-  margin: 50px 100px;
-  height: 82%;
-  width: 29%;
+  height: 100%;
+  width: 94%;
+  margin: 50px 0px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-.btn-sign-in, .btn-sign-up{
+.btn-sign-in,
+.btn-sign-up {
   padding: 0px 12px;
   padding-top: 12px;
 }
 
 .form-control {
-  padding: .5rem .75rem!important;
+  padding: .5rem .75rem !important;
 }
 
-.area-error{
-  padding: 20px 30px;
+.area-error {
+  padding: 20px 10px;
   width: 30%;
+  font-size: 14px;
+  position: fixed;
+  top: 70px;
+  right: 20px;
 }

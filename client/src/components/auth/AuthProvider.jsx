@@ -8,14 +8,20 @@ export const AuthContext = createContext({
 })
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState(null);
 
     const handleLogin = (token) => {
-        const decodedUser = jwt_decode(token)
+        const decodedUser = jwt_decode(token);
+        localStorage.setItem("userId", decodedUser.id);
+        //localStorage.setItem("userRole", decodedUser.roles);
+        localStorage.setItem("token", token);
         setUser(decodedUser)
     }
 
     const handleLogout = () => {
+        localStorage.removeItem("userId");
+        //localStorage.removeItem("userRole");
+        localStorage.removeItem("token");
         setUser(null)
     }
 

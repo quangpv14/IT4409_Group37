@@ -11,27 +11,30 @@ export const SignIn = () => {
         password: ""
     })
 
-    const {handleLogin} = useContext(AuthContext)
+    const { handleLogin } = useContext(AuthContext)
 
     const handleInputChange = (e) => {
         setLogin({ ...login, [e.target.name]: e.target.value })
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        const success = await signIn(login)
-        if (success) {
-            const token = success.token
-            console.log('sucess', success);
-            handleLogin(token)
-            navigate("/")
-            window.location.reload()
+        e.preventDefault();
+        const response = await signIn(login);
+        if (response.status === 200 && response.data.token) {
+            const token = response.data.token;
+            console.log(response.message);
+            handleLogin(token);
+            navigate("/");
+            window.location.reload();
         } else {
-            setErrorMessage("Invalid username or password")
+            const errorMessage = response?.response.status === 401 ?
+                'Email hoặc password không chính xác . Vui lòng thử lại!' :
+                "Đã có lỗi xảy ra. Vui lòng thử lại!";
+            setErrorMessage(errorMessage);
         }
 
         setTimeout(() => {
-            setErrorMessage("")
+            setErrorMessage("");
         }, 4000)
     }
 
@@ -70,7 +73,7 @@ export const SignIn = () => {
                                     <Link to={"/register"} style={{ marginLeft: "5px" }}>Sign up</Link>
                                 </span>
                             </div>
-                            <div style={{ marginTop:'30px' }}>
+                            <div style={{ marginTop: '30px' }}>
                                 <p style={{ marginTop: '10px', fontSize: '14px', textAlign: 'center' }}>
                                     By logging in, I agree to <a href="#" target="_blank">Terms of Use</a> and <a href="#" target="_blank" >Privacy Policy</a>.
                                 </p>

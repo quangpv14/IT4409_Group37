@@ -14,17 +14,18 @@ import { AuthProvider } from "./components/auth/AuthProvider.jsx";
 function App() {
   return (
     <AuthProvider>
-      <main>
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<Admin />} />
+      <NavBar />
 
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/register" element={<SignUp />} />
-        </Routes>
 
-      </main>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
+
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/register" element={<SignUp />} />
+      </Routes>
+
+
       <Footer />
     </AuthProvider>
   );

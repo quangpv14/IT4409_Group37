@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import moment from "moment"
-import { deleteUser, getBookingsByUserId, getUser } from "../utils/ApiFunctions"
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import { deleteUser, getBookingsByUserId, getUser } from "../utils/ApiFunctions";
 
 const Profile = () => {
     const [user, setUser] = useState({
@@ -21,20 +21,20 @@ const Profile = () => {
             bookingCode: ""
         }
     ])
-    const [message, setMessage] = useState("")
-    const [errorMessage, setErrorMessage] = useState("")
-    const navigate = useNavigate()
+    const [message, setMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
 
-    const userId = localStorage.getItem("userId")
-    const token = localStorage.getItem("token")
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const userData = await getUser(userId, token)
-                setUser(userData)
+                const userData = await getUser(userId, token);
+                setUser(userData);
             } catch (error) {
-                console.error(error)
+                console.error(error);
             }
         }
 
@@ -44,15 +44,15 @@ const Profile = () => {
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const response = await getBookingsByUserId(userId, token)
-                setBookings(response)
+                const response = await getBookingsByUserId(userId, token);
+                setBookings(response);
             } catch (error) {
-                console.error("Error fetching bookings:", error.message)
-                setErrorMessage(error.message)
+                console.error("Error fetching bookings:", error.message);
+                setErrorMessage(error.message);
             }
         }
 
-        fetchBookings()
+        fetchBookings();
     }, [userId])
 
     const handleDeleteAccount = async () => {
@@ -63,14 +63,14 @@ const Profile = () => {
             await deleteUser(userId)
                 .then((response) => {
                     setMessage(response.data)
-                    localStorage.removeItem("token")
-                    localStorage.removeItem("userId")
-                    localStorage.removeItem("userRole")
-                    navigate("/")
-                    window.location.reload()
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
+                    localStorage.removeItem("userRole");
+                    navigate("/");
+                    window.location.reload();
                 })
                 .catch((error) => {
-                    setErrorMessage(error.data)
+                    setErrorMessage(error.data);
                 })
         }
     }
