@@ -143,7 +143,7 @@ main {
 .animated-texts p,
 h1,
 h2 {
-  animation: fadeInUp 1s ease-in-out;
+  animation: fadeInUp 0.5s ease-in-out;
 }
 
 @keyframes bounceIn {
@@ -262,4 +262,40 @@ h2 {
   align-items: center;
   justify-items: center;
   flex-direction: column;
+}
+
+.sign-in, .sign-up{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 100px;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+.sign-in-container{
+  padding: 16px 24px 24px;
+  background-color: white;
+  margin: 100px;
+  height: 50%;
+  width: 28%;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.sign-up-container {
+  padding: 16px 24px 24px;
+  background-color: white;
+  margin: 50px 100px;
+  height: 77%;
+  width: 29%;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-sign-in, .btn-sign-up{
+  padding: 0px 12px;
+  padding-top: 12px;
+}
+
+.form-control {
+  padding: .5rem .75rem!important;
 }

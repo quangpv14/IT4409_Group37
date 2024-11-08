@@ -36,9 +36,12 @@ export const SignIn = () => {
     }
 
     return (
-        <section className='container col-6 mt-5 mb-5'>
+        <section className='sign-in'>
            {errorMessage && <p className="alert alert-danger">{errorMessage}</p>}
+           <div className='sign-in-container'>
             <h2>Sign In</h2>
+            <p>For your safety, please log in to access the information</p>
+            <hr></hr>
             <form onSubmit={handleSubmit}>
                 <div className='row mb-3'>
                     <label htmlFor="email" className='col-sm-2 col-form-label'>Email</label>
@@ -55,15 +58,23 @@ export const SignIn = () => {
                             value={login.password} onChange={handleInputChange} placeholder='Enter your password' />
                     </div>
                 </div>
-                <div className='mb-3'>
-                    <button type='submit' className='btn btn-danger' style={{ marginRight: "10px" }}>
+                <div className='row btn-sign-in'>
+                    <button type='submit' className='btn btn-primary' style={{ marginRight: "10px" }}>
                         Sign In
                     </button>
-                    <span style={{ marginLeft: "10px" }}>Don't have an account ?
-                        <Link to={"/register"}>Sign Up</Link>
+                </div>
+                <div style={{ marginTop: "13px" }}>
+                    <span>Don't have an account ?
+                        <Link to={"/register"} style={{ marginLeft: "5px" }}>Sign up</Link>
                     </span>
                 </div>
+                <div style={{ marginTop:'30px' }}>
+                    <p style={{ marginTop: '10px', fontSize: '14px', textAlign: 'center' }}>
+                        By logging in, I agree to <a href="#" target="_blank">Terms of Use</a> and <a href="#" target="_blank" >Privacy Policy</a>.
+                    </p>
+                </div>
             </form>
+           </div>
         </section>
     )
 }
