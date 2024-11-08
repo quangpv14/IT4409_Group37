@@ -7,10 +7,10 @@ export const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-light border-top py-4 rounded-3" style={{
+        <footer className="bg-light border-top py-4 rounded-3 bg-footer" style={{
             borderTop: '2px solid rgba(6, 148, 162, 1)'
         }}>
-            <Container>
+            <Container style={{ maxWidth: '1500px' }}>
                 <Row className="justify-content-between">
                     <Col md={4} className="mb-3">
                         <h5>
