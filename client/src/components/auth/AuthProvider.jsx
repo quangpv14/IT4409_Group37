@@ -12,14 +12,14 @@ export const AuthProvider = ({ children }) => {
 
     const handleLogin = (token) => {
         const decodedUser = jwt_decode(token);
-        localStorage.setItem("userId", decodedUser.id);
+        localStorage.setItem("email", decodedUser.sub);
         //localStorage.setItem("userRole", decodedUser.roles);
         localStorage.setItem("token", token);
         setUser(decodedUser)
     }
 
     const handleLogout = () => {
-        localStorage.removeItem("userId");
+        localStorage.removeItem("email");
         //localStorage.removeItem("userRole");
         localStorage.removeItem("token");
         setUser(null)

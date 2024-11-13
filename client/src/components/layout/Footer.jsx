@@ -14,11 +14,11 @@ export const Footer = () => {
                 <Row className="justify-content-between">
                     <Col md={4} className="mb-3">
                         <h5>
-                            <Link to="/" className="text-decoration-none text-dark">
-                                <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-black">
-                                    Booking
+                            <Link to="/" className="text-decoration-none">
+                                <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg"
+                                    style={{ fontWeight: '700', fontSize: '1em', color: '#007bff' }}>
+                                    Booking.com
                                 </span>
-                                .com
                             </Link>
                         </h5>
                     </Col>

@@ -9,14 +9,14 @@ export const NavBar = () => {
         setShowAccount(!showAccount)
     }
 
-    const isLoggedIn = localStorage.getItem("token")
-    const userRole = localStorage.getItem("userRole")
+    const isLoggedIn = localStorage.getItem("token");
+    const userRole = localStorage.getItem("userRole");
 
     return (
         <nav className='navbar navbar-expand-lg bg-body-tertiary px-5 shadow p-1 sticky-top'>
             <div className='container-fluid'>
                 <Link to={"/"} className='navbar-brand'>
-                    <span className='text-uppercase'>Booking.com</span>
+                    <span className='text-uppercase' style={{ fontWeight: '700', fontSize: '1em', color: '#007bff' }}>Booking.com</span>
                 </Link>
                 <button className='navbar-toggler' type='button' data-bs-toggle='collapse'
                     data-bs-target='#navbarScroll' aria-controls='navbarScroll'
@@ -38,6 +38,10 @@ export const NavBar = () => {
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
                         </li>
                         <li className='nav-item'>
+                            <NavLink to='/rental-register' style={{ color: '#000000' }}
+                                className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Rental Registration</NavLink>
+                        </li>
+                        <li className='nav-item'>
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Help & Support</NavLink>
                         </li>
                         <li className='nav-item dropdown'>
@@ -52,7 +56,12 @@ export const NavBar = () => {
                                         <Link className="dropdown-item" to={"/login"}>
                                             Login
                                         </Link>
+                                        <Link className="dropdown-item" to={"/register"}>
+                                            Sign up
+                                        </Link>
+
                                     </li>
+
                                 )}
                             </ul>
                         </li>

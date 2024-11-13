@@ -4,8 +4,12 @@ export const api = axios.create({
     baseURL: "http://localhost:8080"
 })
 
+export const api_admin = axios.create({
+    baseURL: "http://localhost:8000"
+})
+
 export const getHearder = () => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     return {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -45,5 +49,46 @@ export async function signIn(login) {
         }
     } catch (error) {
         return error;
+    }
+}
+
+/** This function get User Profile */
+export async function getUserProfile(userId, token) {
+    try {
+        const response = await api.get(`/api/users/profile/${userId}`, {
+            headers: getHearder()
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export async function getUser(email, token) {
+    try {
+        const response = await api.get(`/api/customer/${email}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function updateUser(updatedUser, token) {
+    try {
+        const response = await api.put(`/api/customer/update`, updatedUser, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
 }

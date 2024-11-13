@@ -8,7 +8,7 @@ export const Logout = () => {
 
   const handleLogout = () => {
     auth.handleLogout()
-    navigate("/", { state: { message: "You have been logged out!" } })
+    navigate("/login", { state: { message: "You have been logged out!" } })
   }
 
   return (

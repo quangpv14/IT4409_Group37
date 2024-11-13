@@ -20,8 +20,8 @@ export const SignIn = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const response = await signIn(login);
-        if (response.status === 200 && response.data.token) {
-            const token = response.data.token;
+        if (response.status === 200 && response.data) {
+            const token = response.data.data.token;
             console.log(response.message);
             handleLogin(token);
             navigate("/");

@@ -329,3 +329,20 @@ h2 {
   top: 70px;
   right: 20px;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-label {
+  width: 180px;
+}
+
+.profile-alert {
+  position: fixed;
+  right: 100px;
+  z-index: 100;
+  width: 350px;
+  top: 90px;
+}

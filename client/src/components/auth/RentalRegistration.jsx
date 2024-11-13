@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { signUp } from '../utils/ApiFunctions'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { signUp } from '../utils/ApiFunctions';
+import { Link } from 'react-router-dom';
 
-export const SignUp = () => {
+export const RentalRegister = () => {
+
     const [register, setRegister] = useState({
-        firstName: "",
-        lastName: "",
+        name: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -23,8 +23,15 @@ export const SignUp = () => {
     const handleSignUp = async (e) => {
         e.preventDefault();
 
+        // Validate phone number and identification
         if (!/^\d{10,11}$/.test(register.phoneNumber)) {
             setErrorMessage("Phone number must be 10-11 digits.");
+            setTimeout(() => setErrorMessage(""), 2000);
+            return;
+        }
+
+        if (!/^\d{12}$/.test(register.identification)) {
+            setErrorMessage("Identification must be exactly 12 digits.");
             setTimeout(() => setErrorMessage(""), 2000);
             return;
         }
@@ -34,24 +41,23 @@ export const SignUp = () => {
             setTimeout(() => setErrorMessage(""), 2000);
             return;
         }
+
         const formData = {
-            name: `${register.firstName} ${register.lastName}`.trim(),
+            name: register.name,
             email: register.email,
             password: register.password,
-            confirmPassword: register.confirmPassword,
             phoneNumber: register.phoneNumber,
             identification: register.identification,
         };
 
-        try {
-            const result = await signUp(formData);
-            setSuccessMessage(result);
-            setErrorMessage("");
-            //setRegister({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "" })
-        } catch (error) {
-            setSuccessMessage("");
-            setErrorMessage(`Error: ${error.message}`);
-        }
+        // try {
+        //     const result = await signUp(formData);
+        //     setSuccessMessage(result);
+        //     setErrorMessage("");
+        // } catch (error) {
+        //     setSuccessMessage("");
+        //     setErrorMessage(`Error: ${error.message}`);
+        // }
         setTimeout(() => {
             setErrorMessage("");
             setSuccessMessage("");
@@ -64,33 +70,30 @@ export const SignUp = () => {
                 <div style={{ width: '30%' }}></div>
                 <div style={{ width: '40%', height: '100%' }}>
                     <div className='sign-up-container'>
-                        <h2>Sign Up</h2>
-                        <p>Register now to create your account and start using the platform.</p>
+                        <h2>House rental registration</h2>
+                        <p style={{ fontSize: '15px' }}>Welcome guests from around the world – Start your journey with us!</p>
                         <hr></hr>
                         <form onSubmit={handleSignUp}>
-                            <div style={{ display: 'flex' }}>
-                                <div className='mb-2 row'>
-                                    <label htmlFor="firstName" className='col-form-label'>First Name</label>
-                                    <div style={{ width: '90%' }}>
-                                        <input type="text" id='firstName' name='firstName' className='form-control'
-                                            required value={register.firstName} onChange={handleInPutChange} placeholder='Enter your first name' />
-                                    </div>
-                                </div>
-
-                                <div className='mb-2 row'>
-                                    <label htmlFor="lastName" className='col-form-label'>Last Name</label>
-                                    <div>
-                                        <input type="text" id='lastName' name='lastName' className='form-control'
-                                            required value={register.lastName} onChange={handleInPutChange} placeholder='Enter your last name' />
-                                    </div>
+                            <div className='mb-2 row'>
+                                <label htmlFor="name" className='col-form-label'>Full Name</label>
+                                <div>
+                                    <input type="text" id='name' name='name' className='form-control'
+                                        required value={register.name} onChange={handleInPutChange} placeholder='Enter your full name' />
                                 </div>
                             </div>
-
                             <div className='mb-2 row'>
                                 <label htmlFor="phoneNumber" className='col-form-label'>Phone Number</label>
                                 <div>
                                     <input type="text" id='phoneNumber' name='phoneNumber' className='form-control'
                                         required value={register.phoneNumber} onChange={handleInPutChange} placeholder='Enter your phone number' />
+                                </div>
+                            </div>
+
+                            <div className='mb-2 row'>
+                                <label htmlFor="identification" className='col-form-label'>Identification</label>
+                                <div>
+                                    <input type="text" id='identification' name='identification' className='form-control'
+                                        required value={register.identification} onChange={handleInPutChange} placeholder='Enter your identification' />
                                 </div>
                             </div>
 
@@ -142,5 +145,5 @@ export const SignUp = () => {
                 </div>
             </div>
         </section>
-    )
-}
+    );
+} 
