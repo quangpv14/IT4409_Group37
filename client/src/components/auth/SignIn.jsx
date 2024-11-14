@@ -1,11 +1,14 @@
-import React, { useContext, useState } from 'react'
-import { signIn } from '../utils/ApiFunctions'
+import React, { useContext, useState } from 'react';
+import { signIn } from '../utils/ApiFunctions';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthProvider';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
 
 export const SignIn = () => {
     const [errorMessage, setErrorMessage] = useState("")
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [login, setLogin] = useState({
         email: "",
         password: ""
@@ -21,13 +24,17 @@ export const SignIn = () => {
         e.preventDefault();
         const response = await signIn(login);
         if (response.status === 200 && response.data) {
-            const token = response.data.data.token;
+            const data = response.data.data;
+            const token = data.token;
+            const email = data.email;
+            const name = data.name;
             console.log(response.message);
-            handleLogin(token);
+            dispatch(setUser({ token, email, name }));
+            handleLogin(token, name);
             navigate("/");
             window.location.reload();
         } else {
-            const errorMessage = response?.response.status === 401 ?
+            const errorMessage = response?.response?.status === 401 ?
                 'Email hoặc password không chính xác . Vui lòng thử lại!' :
                 "Đã có lỗi xảy ra. Vui lòng thử lại!";
             setErrorMessage(errorMessage);

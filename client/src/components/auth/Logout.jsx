@@ -1,14 +1,20 @@
-import React, { useContext } from 'react'
-import { AuthContext } from './AuthProvider'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearUser } from '../../store/userSlice';
 
 export const Logout = () => {
-  const auth = useContext(AuthContext)
-  const navigate = useNavigate()
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { email, name, isAuthenticated } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    auth.handleLogout()
+    auth.handleLogout();
+    dispatch(clearUser());
     navigate("/login", { state: { message: "You have been logged out!" } })
+    window.location.reload();
   }
 
   return (

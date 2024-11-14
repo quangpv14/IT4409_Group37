@@ -1,16 +1,17 @@
-import React, { useContext, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import { Logout } from '../auth/Logout'
+import React, { useContext, useState, useEffect } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { Logout } from '../auth/Logout';
 
 export const NavBar = () => {
-    const [showAccount, setShowAccount] = useState(false)
-
+    const [showAccount, setShowAccount] = useState(false);
     const handleAccountClick = () => {
         setShowAccount(!showAccount)
     }
-
+    const [userName, setUserName] = useState(localStorage.getItem("name"));
     const isLoggedIn = localStorage.getItem("token");
-    const userRole = localStorage.getItem("userRole");
+    useEffect(() => {
+        setUserName(localStorage.getItem("name"));
+    }, [isLoggedIn]);
 
     return (
         <nav className='navbar navbar-expand-lg bg-body-tertiary px-5 shadow p-1 sticky-top'>
@@ -47,7 +48,7 @@ export const NavBar = () => {
                         <li className='nav-item dropdown'>
                             <a className={`text-reset nav-link dropdown-toggle ${showAccount ? "show" : ""}`}
                                 href='' role='button' data-bs-toggle='dropdown' aria-expanded='false' onClick={handleAccountClick}>{""}
-                                <i className="bi bi-person-circle"></i> Account</a>
+                                <i className="bi bi-person-circle"></i> {userName ? userName : 'Account'}</a>
                             <ul className={`dropdown-menu ${showAccount ? "show" : ""}`} aria-labelledby='navbarDropdown'>
                                 {isLoggedIn ? (
                                     <Logout />
