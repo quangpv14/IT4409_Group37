@@ -10,7 +10,7 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
-    const handleLogin = (token, name) => {
+    const handleLogin = (token, name, roles) => {
         const decodedUser = jwt_decode(token);
         localStorage.setItem("email", decodedUser.sub);
         localStorage.setItem("name", name);

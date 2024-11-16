@@ -38,10 +38,12 @@ export const NavBar = () => {
                         <li className='nav-item'>
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
                         </li>
-                        <li className='nav-item'>
-                            <NavLink to='/rental-register' style={{ color: '#000000' }}
-                                className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Rental Registration</NavLink>
-                        </li>
+                        {!isLoggedIn && (
+                            <li className='nav-item'>
+                                <NavLink to='/rental-register' style={{ color: '#000000' }}
+                                    className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Rental Registration</NavLink>
+                            </li>
+                        )}
                         <li className='nav-item'>
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Help & Support</NavLink>
                         </li>

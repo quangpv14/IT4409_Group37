@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import moment from "moment";
 import { updateUser, getUser } from "../utils/ApiFunctions";
+import { useSelector, useDispatch } from 'react-redux';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
-
+    const { name, isAuthenticated, isAdmin } = useSelector((state) => state.user);
     const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
 

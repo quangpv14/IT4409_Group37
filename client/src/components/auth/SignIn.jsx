@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { signIn } from '../utils/ApiFunctions';
+import { signIn, signInAdmin } from '../utils/ApiFunctions';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthProvider';
 import { useDispatch } from 'react-redux';
@@ -13,7 +13,7 @@ export const SignIn = () => {
         email: "",
         password: ""
     })
-
+    const [isAdminLogin, setIsAdminLogin] = useState(false);
     const { handleLogin } = useContext(AuthContext)
 
     const handleInputChange = (e) => {
@@ -22,16 +22,23 @@ export const SignIn = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await signIn(login);
+        const response = isAdminLogin
+            ? await signInAdmin(login)
+            : await signIn(login);
         if (response.status === 200 && response.data) {
             const data = response.data.data;
-            const token = data.token;
-            const email = data.email;
-            const name = data.name;
+            const { token, email, name, roles } = data;
+            const role = roles || [];
+
             console.log(response.message);
-            dispatch(setUser({ token, email, name }));
-            handleLogin(token, name);
-            navigate("/");
+            dispatch(setUser({ token, email, name, role }));
+            handleLogin(token, name, role);
+
+            if (isAdminLogin) {
+                navigate("/dashboard");
+            } else {
+                navigate("/");
+            }
             window.location.reload();
         } else {
             const errorMessage = response?.response?.status === 401 ?
@@ -68,6 +75,20 @@ export const SignIn = () => {
                                 <div>
                                     <input type="password" id='password' name='password' className='form-control' required
                                         value={login.password} onChange={handleInputChange} placeholder='Enter your password' />
+                                </div>
+                            </div>
+                            <div className="row mb-2">
+                                <div className='cb-sign-in'>
+                                    <input
+                                        className=""
+                                        type="checkbox"
+                                        id="adminLogin"
+                                        name="adminLogin"
+                                        onChange={(e) => setIsAdminLogin(e.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="adminLogin" style={{ marginLeft: '5px' }}>
+                                        Sign in as an administrator
+                                    </label>
                                 </div>
                             </div>
                             <div className='row btn-sign-in'>

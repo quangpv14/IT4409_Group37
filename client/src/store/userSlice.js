@@ -6,6 +6,7 @@ const initialState = {
     email: '',
     name: '',
     isAuthenticated: false,
+    isAdmin: false,
 };
 
 const userSlice = createSlice({
@@ -17,12 +18,14 @@ const userSlice = createSlice({
             state.email = action.payload.email;
             state.name = action.payload.name;
             state.isAuthenticated = true;
+            state.isAdmin = action.payload.role && action.payload.role.includes('ROLE_ADMIN');
         },
         clearUser: (state) => {
-            state.token = null;
-            state.email = null;
-            state.name = null;
+            state.token = '';
+            state.email = '';
+            state.name = '';
             state.isAuthenticated = false;
+            state.isAdmin = false;
         },
     },
 });

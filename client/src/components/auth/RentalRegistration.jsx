@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { signUp } from '../utils/ApiFunctions';
-import { Link } from 'react-router-dom';
+import { signUpHotel } from '../utils/ApiFunctions';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const RentalRegister = () => {
 
@@ -12,7 +12,7 @@ export const RentalRegister = () => {
         phoneNumber: "",
         identification: "",
     });
-
+    const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -50,18 +50,28 @@ export const RentalRegister = () => {
             identification: register.identification,
         };
 
-        // try {
-        //     const result = await signUp(formData);
-        //     setSuccessMessage(result);
-        //     setErrorMessage("");
-        // } catch (error) {
-        //     setSuccessMessage("");
-        //     setErrorMessage(`Error: ${error.message}`);
-        // }
+        try {
+            const response = await signUpHotel(formData);
+            if (response && response.status === 201) {
+                // Successful sign-up
+                setSuccessMessage("Sign-up successful!");  // Show success message
+                setTimeout(() => {
+                    navigate("/login");
+                }, 3000);
+            } else {
+                // Handle case where status is not 201, if needed
+                setErrorMessage("Something went wrong, please try again.");
+            }
+            setErrorMessage("");
+
+        } catch (error) {
+            setSuccessMessage("");
+            setErrorMessage(`Error: Something went wrong, please try again.`);
+        }
         setTimeout(() => {
             setErrorMessage("");
             setSuccessMessage("");
-        }, 5000)
+        }, 3000)
     }
 
     return (

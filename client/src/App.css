@@ -330,7 +330,8 @@ h2 {
   right: 20px;
 }
 
-.user-info {
+.user-info,
+.cb-sign-in {
   display: flex;
   align-items: center;
 }
