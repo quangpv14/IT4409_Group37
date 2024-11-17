@@ -331,7 +331,8 @@ h2 {
 }
 
 .user-info,
-.cb-sign-in {
+.cb-sign-in,
+.search-area {
   display: flex;
   align-items: center;
 }
@@ -346,4 +347,48 @@ h2 {
   z-index: 100;
   width: 350px;
   top: 90px;
+}
+
+.hotel-function {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.hotel-search {
+  border-radius: 20px;
+  padding: 5px 15px;
+  height: 35px;
+  width: 300px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.btn {
+  border-radius: 20px;
+  color: white;
+  padding: 0px 15px;
+  height: 35px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-search {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-search,
+.btn-search:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-create,
+.btn-create:hover {
+  background-color: green;
+  color: white;
 }
