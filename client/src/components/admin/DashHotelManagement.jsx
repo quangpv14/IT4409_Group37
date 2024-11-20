@@ -2,8 +2,90 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiSearch } from 'react-icons/fi';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 const DashHotelManagement = () => {
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    description: "",
+    checkin: "",
+    checkout: "",
+    parking: false,
+    keepLuggage: false,
+    freeWifi: false,
+    laundryService: false,
+    roomService: false,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleCreate = () => {
+    setFormData({
+      name: "",
+      address: "",
+      description: "",
+      checkin: "",
+      checkout: "",
+      parking: false,
+      keepLuggage: false,
+      freeWifi: false,
+      laundryService: false,
+      roomService: false,
+    });
+    setShowCreateDialog(true);
+  };
+
+  const handleEdit = (hotel) => {
+    setFormData(hotel);
+    setSelectedHotel(hotel);
+    setShowEditDialog(true);
+  };
+
+  const submitToServer = () => {
+    console.log("Submitting Data:", formData);
+    console.log("Submitting Data:", formData);
+    console.log("Submitting Data:", formData);
+    console.log("Submitting Data:", formData);
+    // setShowCreateDialog(false);
+    // setShowEditDialog(false);
+    // setShowSuccessDialog(true); 
+  };
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
+  };
+
+  const handleDelete = (hotel) => {
+    setSelectedHotel(hotel);
+    setShowDeleteDialog(true);
+  };
+
+  // Hàm đóng modal
+  const handleCloseModal = () => {
+    setShowDeleteDialog(false);
+    setSelectedHotel(null);
+  };
+
+  // Hàm xóa khách sạn
+  const confirmDelete = (hotel) => {
+
+    setShowDeleteDialog(false);  // Đóng modal sau khi xóa
+    setSelectedHotel(null);  // Reset selectedHotel
+  };
+
   //const [hotelManagers, setHotelManagers] = useState([]);
   const hotelManagers = [
     {
@@ -102,7 +184,7 @@ const DashHotelManagement = () => {
         </div>
         <div style={{ marginLeft: 'auto' }}>
           {/* Create Hotel Button */}
-          <button className="btn btn-create">
+          <button className="btn btn-create" onClick={handleCreate}>
             Create Hotel
           </button>
         </div>
@@ -159,6 +241,8 @@ const DashHotelManagement = () => {
                       marginRight: "5px",
                       cursor: "pointer",
                     }}
+
+                    onClick={() => handleEdit(hotel)}
                   >
                     <FaEdit style={{ marginBottom: '3px' }} />
                   </button>
@@ -172,6 +256,7 @@ const DashHotelManagement = () => {
                       padding: "2px 3px",
                       cursor: "pointer",
                     }}
+                    onClick={() => handleDelete(hotel)}
                   >
                     <FaTrashAlt style={{ marginBottom: '1px' }} />
                   </button>
@@ -181,6 +266,140 @@ const DashHotelManagement = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Show the create or edit dialog */}
+      {(showCreateDialog || showEditDialog) && (
+        <Modal size='lg' backdrop="static" show={showCreateDialog || showEditDialog} onHide={() => {
+          setShowCreateDialog(false);
+          setShowEditDialog(false);
+        }}>
+          <Modal.Header closeButton>
+            <Modal.Title>{showCreateDialog ? "Create Hotel" : `Edit Hotel: ${selectedHotel?.name}`}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId="formHotelName">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter hotel name"
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formHotelAddress">
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="Enter hotel address"
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formHotelDescription">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter description"
+                  style={{ minHeight: '100px' }}
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formHotelCheckin">
+                <Form.Label>Check-in</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="checkin"
+                  value={formData.checkin}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group controlId="formHotelCheckout">
+                <Form.Label>Check-out</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="checkout"
+                  value={formData.checkout}
+                  onChange={handleInputChange}
+                  required
+                />
+              </Form.Group>
+
+              {/* Checkbox options */}
+              {['parking', 'keepLuggage', 'freeWifi', 'laundryService', 'roomService'].map((service) => (
+                <Form.Group key={service} controlId={`formHotel${service}`}>
+                  <Form.Check
+                    type="checkbox"
+                    label={service.charAt(0).toUpperCase() + service.slice(1).replace(/([A-Z])/g, ' $1')}
+                    name={service}
+                    checked={formData[service]}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              ))}
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => {
+              setShowCreateDialog(false);
+              setShowEditDialog(false);
+            }}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={submitToServer}>
+              Submit
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
+      {/* Success Dialog */}
+      {showSuccessDialog && (
+        <div className="dialog" style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px", background: "#fff", marginTop: "20px" }}>
+          <h2>{selectedHotel ? "Update Successful!" : "Hotel Created Successfully!"}</h2>
+          <button
+            onClick={handleSuccessDialogClose}
+            style={{
+              backgroundColor: "#28a745",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            OK
+          </button>
+        </div>
+      )}
+
+      {/* Modal xác nhận xóa */}
+      <Modal show={showDeleteDialog} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the hotel <strong>{selectedHotel?.name}</strong>?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={() => confirmDelete(selectedHotel)}>
+            Delete
+          </Button>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Cancel
+          </Button>
+
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
