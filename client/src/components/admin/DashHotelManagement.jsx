@@ -337,20 +337,22 @@ const DashHotelManagement = () => {
               </div>
 
               {/* Checkbox options */}
-              {['parking', 'keepLuggage', 'freeWifi', 'laundryService', 'roomService'].map((service) => (
-                <Form.Group key={service} controlId={`formHotel${service}`}>
-                  <Form.Check
-                    type="checkbox"
-                    label={service.charAt(0).toUpperCase() + service.slice(1).replace(/([A-Z])/g, ' $1')}
-                    name={service}
-                    checked={formData[service]}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              ))}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.5rem' }}>
+                {['parking', 'keepLuggage', 'freeWifi', 'laundryService', 'roomService'].map((service) => (
+                  <Form.Group key={service} controlId={`formHotel${service}`} style={{ flex: '1 1 calc(50% - 0.5rem)' }}>
+                    <Form.Check
+                      type="checkbox"
+                      label={service.charAt(0).toUpperCase() + service.slice(1).replace(/([A-Z])/g, ' $1')}
+                      name={service}
+                      checked={formData[service]}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Group>
+                ))}
+              </div>
             </Form>
           </Modal.Body>
-          <Modal.Footer>
+          <Modal.Footer style={{ borderTop: "none" }}>
             <Button variant="primary" onClick={submitToServer}>
               Submit
             </Button>
