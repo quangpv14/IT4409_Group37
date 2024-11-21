@@ -278,7 +278,7 @@ const DashHotelManagement = () => {
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <Form.Group controlId="formHotelName">
+              <Form.Group controlId="formHotelName" style={{ marginBottom: '0.5rem' }}>
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                   type="text"
@@ -289,7 +289,7 @@ const DashHotelManagement = () => {
                 />
               </Form.Group>
 
-              <Form.Group controlId="formHotelAddress">
+              <Form.Group controlId="formHotelAddress" style={{ marginBottom: '0.5rem' }}>
                 <Form.Label>Address</Form.Label>
                 <Form.Control
                   type="text"
@@ -300,7 +300,7 @@ const DashHotelManagement = () => {
                 />
               </Form.Group>
 
-              <Form.Group controlId="formHotelDescription">
+              <Form.Group controlId="formHotelDescription" style={{ marginBottom: '0.5rem' }}>
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -312,7 +312,8 @@ const DashHotelManagement = () => {
                 />
               </Form.Group>
 
-              <Form.Group controlId="formHotelCheckin">
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+              <Form.Group controlId="formHotelCheckin " style={{ flex: 1 }} >
                 <Form.Label>Check-in</Form.Label>
                 <Form.Control
                   type="text"
@@ -323,7 +324,7 @@ const DashHotelManagement = () => {
                 />
               </Form.Group>
 
-              <Form.Group controlId="formHotelCheckout">
+              <Form.Group controlId="formHotelCheckout" style={{ flex: 1 }} >
                 <Form.Label>Check-out</Form.Label>
                 <Form.Control
                   type="text"
@@ -333,6 +334,7 @@ const DashHotelManagement = () => {
                   required
                 />
               </Form.Group>
+              </div>
 
               {/* Checkbox options */}
               {['parking', 'keepLuggage', 'freeWifi', 'laundryService', 'roomService'].map((service) => (
@@ -349,14 +351,14 @@ const DashHotelManagement = () => {
             </Form>
           </Modal.Body>
           <Modal.Footer>
+            <Button variant="primary" onClick={submitToServer}>
+              Submit
+            </Button>
             <Button variant="secondary" onClick={() => {
               setShowCreateDialog(false);
               setShowEditDialog(false);
             }}>
               Cancel
-            </Button>
-            <Button variant="primary" onClick={submitToServer}>
-              Submit
             </Button>
           </Modal.Footer>
         </Modal>
