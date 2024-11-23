@@ -194,7 +194,7 @@ const DashHotelManagement = () => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead style={{ backgroundColor: "#003366", color: "white", border: "1px solid #ccc" }}>
             <tr>
-              <th style={{ border: "1px solid #ccc" }}>No</th>
+              <th style={{ border: "1px solid #ccc" }}>Id</th>
               <th style={{ border: "1px solid #ccc" }}>Hotel Name</th>
               <th style={{ border: "1px solid #ccc" }}>Address</th>
               <th style={{ border: "1px solid #ccc" }}>Description</th>
