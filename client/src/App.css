@@ -392,3 +392,16 @@ h2 {
   background-color: green;
   color: white;
 }
+
+.btn-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ellipse-text {
+  border: 1px solid gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
