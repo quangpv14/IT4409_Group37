@@ -123,3 +123,44 @@ export async function updateUser(updatedUser, token) {
         throw error;
     }
 }
+
+// Function to create a hotel
+export const createHotel = async (data) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.post('/hotel/register', data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Function to update hotel details
+export const updateHotel = async (hotelId, data) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.put(`/hotel/update/${hotelId}`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getHotelsByAdmin = async (email) => {
+    try {
+        const response = await api_admin.get(`/hotel/findall/${email}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching hotels:', error);
+    }
+};
