@@ -23,7 +23,7 @@ const DashHotelManagement = () => {
   const [progressPercents, setProgressPercents] = useState([]); // Lưu tiến độ của từng ảnh
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -121,38 +121,45 @@ const DashHotelManagement = () => {
     }
 
     if (showCreateDialog) {
+      setLoading(true);
       createHotel(formData)
         .then((response) => {
-          setShowCreateDialog(false);
-          setShowEditDialog(false);
           setShowSuccessDialog(true);
         })
         .catch((error) => {
-          setShowErrorDialog(true);
-        });
+          setErrorMessage("An error has occurred. Please try again later.");
+          setTimeout(() => setErrorMessage(""), 2000);
+          return;
+        }).finally(() => setLoading(false));
     } else if (showEditDialog) {
+      setLoading(true);
       updateHotel(selectedHotel.id, formData)
         .then((response) => {
-          setShowCreateDialog(false);
-          setShowEditDialog(false);
-          setShowErrorDialog(true);
+          setShowSuccessDialog(true);
         })
         .catch((error) => {
-          setShowErrorDialog(true);
-        });
+          setErrorMessage("An error has occurred. Please try again later.");
+          setTimeout(() => setErrorMessage(""), 2000);
+          return;
+        }).finally(() => setLoading(false));
     }
 
-    console.log("Submitting Data:", formData);
   };
 
-  const handleSuccessDialogClose = () => {
+  const handleSuccessDialogClose = async () => {
     setShowSuccessDialog(false);
     setShowCreateDialog(false);
     setShowEditDialog(false);
-  };
-
-  const handleErrorDialogClose = () => {
-    setShowErrorDialog(false);
+    setLoading(true);
+    try {
+      const data = await getHotelsByAdmin(email);
+      setHotelManagers(data);
+    } catch (err) {
+      setErrorLoading('Failed to fetch hotels');
+      setTimeout(() => setErrorLoading(""), 2000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = (hotel) => {
@@ -171,83 +178,18 @@ const DashHotelManagement = () => {
     setSelectedHotel(null);
   };
 
-  // const hotelManagers = [
-  //   {
-  //     id: 1,
-  //     name: "Hotel Paradise",
-  //     address: "123 Ocean View Street, Miami",
-  //     description: "A luxurious hotel by the beach with breathtaking views.",
-  //     checkin: "14:00",
-  //     checkout: "12:00",
-  //     parking: true,
-  //     keep_luggage: true,
-  //     free_wifi: true,
-  //     laundry_service: false,
-  //     room_service: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Mountain Retreat",
-  //     address: "456 Alpine Road, Denver",
-  //     description: "A peaceful getaway in the mountains.",
-  //     checkin: "15:00",
-  //     checkout: "11:00",
-  //     parking: true,
-  //     keep_luggage: false,
-  //     free_wifi: true,
-  //     laundry_service: true,
-  //     room_service: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "City Central Hotel",
-  //     address: "789 Downtown Avenue, New York",
-  //     description: "A modern hotel located in the heart of the city.",
-  //     checkin: "13:00",
-  //     checkout: "10:00",
-  //     parking: false,
-  //     keep_luggage: true,
-  //     free_wifi: true,
-  //     laundry_service: true,
-  //     room_service: true,
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Safari Lodge",
-  //     address: "101 Savanna Road, Nairobi",
-  //     description: "Experience the wild with luxury at this safari lodge.",
-  //     checkin: "16:00",
-  //     checkout: "11:00",
-  //     parking: true,
-  //     keep_luggage: true,
-  //     free_wifi: false,
-  //     laundry_service: true,
-  //     room_service: false,
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "Tropical Haven",
-  //     address: "202 Island Lane, Honolulu",
-  //     description: "A relaxing tropical resort surrounded by nature.",
-  //     checkin: "14:00",
-  //     checkout: "12:00",
-  //     parking: true,
-  //     keep_luggage: true,
-  //     free_wifi: true,
-  //     laundry_service: true,
-  //     room_service: true,
-  //   },
-  // ];
-
   useEffect(() => {
     // Gọi hàm getAllHotels khi component mount
     const fetchHotels = async () => {
+      setLoading(true);
       try {
         const data = await getHotelsByAdmin(email);
         setHotelManagers(data);
       } catch (err) {
         setErrorLoading('Failed to fetch hotels');
         setTimeout(() => setErrorLoading(""), 2000);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -256,6 +198,7 @@ const DashHotelManagement = () => {
 
   return (
     <div style={{ height: '100vh', marginRight: '30px' }}>
+      {loading && <div className="loading-overlay">Loading...</div>}
       {errorLoading && <p className="alert alert-danger profile-alert">{errorLoading}</p>}
       <h1 style={{ textAlign: 'center' }}>Hotel Manager</h1>
       <div className="hotel-function">
@@ -302,9 +245,9 @@ const DashHotelManagement = () => {
               >
                 <td style={{ border: "1px solid gray", textAlign: "center" }}>{index + 1}</td>
                 <td style={{ maxWidth: "220px" }} className="ellipse-text">{hotel.name}</td>
-                <td style={{ maxWidth: "410px" }} className="ellipse-text">{hotel.address}</td>
+                <td style={{ maxWidth: "350px" }} className="ellipse-text">{hotel.address}</td>
                 <td
-                  style={{ maxWidth: "200px" }} className="ellipse-text"
+                  style={{ maxWidth: "260px" }} className="ellipse-text"
                   title={hotel.description} // Tooltip to show full text
                 >
                   {hotel.description}
@@ -491,9 +434,9 @@ const DashHotelManagement = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <h6 style={{ marginTop: '8px' }}>{selectedHotel ? "Hotel update successful!" : "Hotel created successfully!"}</h6>
+          <h6 style={{ marginTop: '8px' }}>{showEditDialog ? "Hotel update successful!" : "Hotel created successfully!"}</h6>
         </Modal.Body>
-        <Modal.Footer style={{ padding: '0px' }}>
+        <Modal.Footer style={{ padding: '0px', backgroundColor: '#EEEEEE' }}>
           <div className="btn-center" style={{ padding: '1px 0px', backgroundColor: '#f5f5f6' }}>
             <button
               onClick={handleSuccessDialogClose}
