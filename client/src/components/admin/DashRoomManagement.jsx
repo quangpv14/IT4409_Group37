@@ -2,21 +2,80 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiSearch } from 'react-icons/fi';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { useSelector } from 'react-redux';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { app, storage } from '../../firebaseConfig';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { createRoom, updateRoom, getRoomsByAdmin } from "../utils/ApiFunctions";
+import { createHotel, updateHotel, getHotelsByAdmin } from "../utils/ApiFunctions";
 
 const DashRoomManagement = () => {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
+    const [errorLoading, setErrorLoading] = useState(false);
+    const [roomManagers, setRoomManagers] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
+    const { email, isAdmin } = useSelector((state) => state.user);
+    const [images, setImages] = useState([]); // Lưu trữ file ảnh được chọn
+    const [progressPercents, setProgressPercents] = useState([]); // Lưu tiến độ của từng ảnh
+    const [message, setMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [hotels, setHotels] = useState([]);
+    const [selectedHotel, setSelectedHotel] = useState("");
 
   const [formData, setFormData] = useState({
+    hotelId: "",
+    roomType: "",
     description: "",
     price: "",
-    roomType: "",
-    hotelId: ""
   });
+
+  const handleFileChange = (e) => {
+    setMessage("");
+    setErrorMessage("");
+    const selectedFiles = Array.from(e.target.files);
+    setImages(Array.from(e.target.files)); // Chuyển các file ảnh thành một mảng
+    if (images.length > 5) {
+      setErrorMessage("You can upload a maximum of 5 images.");
+      setTimeout(() => setErrorMessage(""), 2000);
+      return;
+    }
+    setProgressPercents(Array.from(e.target.files).map(() => 0));
+  };
+
+  const handleUploadImages = () => {
+    images.forEach((image, index) => {
+      const storageRef = ref(storage, `files/${image.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setProgressPercents((prev) => {
+            const newProgress = [...prev];
+            newProgress[index] = progress;
+            return newProgress;
+          });
+        },
+        (error) => {
+          alert(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setFormData((prevData) => ({
+              ...prevData,
+              paths: [...(prevData.paths || []), downloadURL],
+            }));
+          });
+        }
+      );
+    });
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,10 +87,10 @@ const DashRoomManagement = () => {
 
   const handleCreate = () => {
     setFormData({
+      hotelId: "",
       description: "",
       price: "",
       roomType: "",
-      hotelId: "",
     });
     setShowCreateDialog(true);
   };
@@ -43,17 +102,46 @@ const DashRoomManagement = () => {
   };
 
   const submitToServer = () => {
+    if (formData.name === "" || formData.address === "" || formData.description === "" || formData.checkin === "" ||
+      formData.checkout === "" || formData.paths.length === 0) {
+      setErrorMessage("Please fill in all the information!");
+      setTimeout(() => setErrorMessage(""), 2000);
+      return;
+    }
+
+    if (showCreateDialog) {
+      createRoom(formData)
+        .then((response) => {
+          setShowCreateDialog(false);
+          setShowEditDialog(false);
+          setShowSuccessDialog(true);
+        })
+        .catch((error) => {
+          setShowErrorDialog(true);
+        });
+    } else if (showEditDialog) {
+      updateRoom(selectedRoom.id, formData)
+        .then((response) => {
+          setShowCreateDialog(false);
+          setShowEditDialog(false);
+          setShowErrorDialog(true);
+        })
+        .catch((error) => {
+          setShowErrorDialog(true);
+        });
+    }
+
     console.log("Submitting Data:", formData);
-    console.log("Submitting Data:", formData);
-    console.log("Submitting Data:", formData);
-    console.log("Submitting Data:", formData);
-    // setShowCreateDialog(false);
-    // setShowEditDialog(false);
-    // setShowSuccessDialog(true); 
   };
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
+    setShowCreateDialog(false);
+    setShowEditDialog(false);
+  };
+
+  const handleErrorDialogClose = () => {
+    setShowErrorDialog(false);
   };
 
   const handleDelete = (room) => {
@@ -75,55 +163,63 @@ const DashRoomManagement = () => {
   };
 
   //const [roomManagers, setRoomManagers] = useState([]);
-  const roomManagers = [
-    {
-      id: 1,
-      description: "A luxurious suite with a stunning sea view.",
-      price: 250,
-      roomType: "Suite",
-      hotelId: 101,
-    },
-    {
-      id: 2,
-      description: "A comfortable single room in the city center.",
-      price: 80,
-      roomType: "Single",
-      hotelId: 102,
-    },
-    {
-      id: 3,
-      description: "A spacious double room with modern amenities.",
-      price: 150,
-      roomType: "Double",
-      hotelId: 103,
-    },
-    {
-      id: 4,
-      description: "A budget-friendly room with basic facilities.",
-      price: 50,
-      roomType: "Economy",
-      hotelId: 104,
-    },
-    {
-      id: 5,
-      description: "A premium king-sized suite with all-inclusive services.",
-      price: 400,
-      roomType: "King Suite",
-      hotelId: 105,
-    },
-  ];
+  // const roomManagers = [
+  //   {
+  //     id: 1,
+  //     description: "A luxurious suite with a stunning sea view.",
+  //     price: 250,
+  //     roomType: "Suite",
+  //     hotelId: 101,
+  //   },
+  //   {
+  //     id: 2,
+  //     description: "A comfortable single room in the city center.",
+  //     price: 80,
+  //     roomType: "Single",
+  //     hotelId: 102,
+  //   },
+  //   {
+  //     id: 3,
+  //     description: "A spacious double room with modern amenities.",
+  //     price: 150,
+  //     roomType: "Double",
+  //     hotelId: 103,
+  //   },
+  //   {
+  //     id: 4,
+  //     description: "A budget-friendly room with basic facilities.",
+  //     price: 50,
+  //     roomType: "Economy",
+  //     hotelId: 104,
+  //   },
+  //   {
+  //     id: 5,
+  //     description: "A premium king-sized suite with all-inclusive services.",
+  //     price: 400,
+  //     roomType: "King Suite",
+  //     hotelId: 105,
+  //   },
+  // ];
 
   // Lấy dữ liệu từ API
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:5000/api/room-managers")
-  //     .then((response) => {
-  //       setRoomManagers(response.data); // Lưu dữ liệu vào state
-  //     })
-  //     .catch((error) => {
-  //       console.error("Lỗi khi gọi API:", error);
-  //     });
-  // }, []);
+  useEffect(() => {
+    // Gọi hàm getAllRooms khi component mount
+    const fetchData = async () => {
+      try {
+        // Lấy danh sách phòng
+        const data = await getRoomsByAdmin(email);
+        setRoomManagers(data);
+
+        // Lấy danh sách khách sạn
+        const hotelData = await getHotelsByAdmin(email);
+        setHotels(hotelData);
+      } catch (err) {
+        setErrorLoading('Failed to fetch hotels');
+        setTimeout(() => setErrorLoading(""), 2000);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div style={{ height: '100vh', marginRight: '30px' }}>
@@ -153,15 +249,16 @@ const DashRoomManagement = () => {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead style={{ backgroundColor: "#003366", color: "white", border: "1px solid #ccc" }}>
             <tr>
-              <th style={{ border: "1px solid #ccc" }}>Id</th>
-              <th style={{ border: "1px solid #ccc" }}>Description</th>
-              <th style={{ border: "1px solid #ccc" }}>Price</th>
-              <th style={{ border: "1px solid #ccc" }}>Room type</th>
+              <th style={{ border: "1px solid #ccc" }}>No</th>
               <th style={{ border: "1px solid #ccc" }}>Hotel Id</th>
+              <th style={{ border: "1px solid #ccc" }}>Price</th>
+              <th style={{ border: "1px solid #ccc" }}>Description</th>
+              <th style={{ border: "1px solid #ccc" }}>Room type</th>
+              <th style={{ border: "1px solid #ccc" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {roomManagers.map((room, index) => (
+            {roomManagers?.map((room, index) => (
               <tr
                 key={room.id}
                 style={{
@@ -170,10 +267,10 @@ const DashRoomManagement = () => {
                 }}
               >
                 <td style={{ border: "1px solid gray", textAlign: "center" }}>{index + 1}</td>
-                <td style={{ border: "1px solid gray" }}>{room.description}</td>
+                <td style={{ border: "1px solid gray" }}>{room.id}</td>
                 <td style={{ border: "1px solid gray" }}>{room.price}</td>
+                <td style={{ border: "1px solid gray" }}>{room.description}</td>
                 <td style={{ border: "1px solid gray" }}>{room.roomType}</td>
-                <td style={{ border: "1px solid gray" }}>{room.hotelId}</td>
                 <td style={{ border: "1px solid gray", textAlign: "center", padding: "2px" }}>
                   {/* Edit Button */}
                   <button
@@ -223,6 +320,27 @@ const DashRoomManagement = () => {
           </Modal.Header>
           <Modal.Body>
             <Form>
+            {showCreateDialog && (
+            <Form.Group controlId="formChooseHotel " style={{ flex: 1 }} >
+            <Form.Label>Choose Hotel</Form.Label>
+            <Form.Control
+              as="select"
+              value={selectedHotel}
+              onChange={(e) => setSelectedHotel(e.target.value)}
+              required
+            >
+              <option value="">
+                select a hotel
+              </option>
+              {hotels.map((hotel) => (
+                <option key={hotel.id} value={hotel.id}>
+                  {hotel.name}
+                </option>
+              ))}
+            </Form.Control>
+            </Form.Group>
+          )}
+
               <Form.Group controlId="formDescription" style={{ marginBottom: '0.5rem' }}>
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -234,6 +352,39 @@ const DashRoomManagement = () => {
                   style={{ minHeight: '100px' }}
                 />
               </Form.Group>
+
+              <Form.Group controlId="formFileMultiple" className="mb-3">
+                <Form.Label>Choose images</Form.Label>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Form.Control type="file" multiple onChange={handleFileChange} />
+                  <Button
+                    variant="secondary"
+                    onClick={handleUploadImages}
+                    style={{ marginLeft: '5px' }}
+                  >
+                    Upload
+                  </Button>
+                </div>
+
+              </Form.Group>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {formData.paths?.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt="uploaded file"
+                    style={{
+                      width: "130px",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      padding: "5px",
+                      background: "#f0f0f0",
+                    }}
+                  />
+                ))}
+              </div>
 
               <Form.Group controlId="formPrice" style={{ marginBottom: '0.5rem' }}>
                 <Form.Label>Price</Form.Label>
@@ -254,17 +405,6 @@ const DashRoomManagement = () => {
                   value={formData.roomType}
                   onChange={handleInputChange}
                   placeholder="Enter room type"
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formHotelId " style={{ flex: 1 }} >
-                <Form.Label>Hotel Id</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="HotelId"
-                  value={formData.hotelId}
-                  onChange={handleInputChange}
-                  placeholder="Enter hotel Id"
                 />
               </Form.Group>
 

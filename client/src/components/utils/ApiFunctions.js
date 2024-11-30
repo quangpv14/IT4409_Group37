@@ -164,3 +164,55 @@ export const getHotelsByAdmin = async (email) => {
         console.error('Error fetching hotels:', error);
     }
 };
+
+// Function to create a room
+export const createRoom = async (data) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.post('/room/register', data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Function to update room details
+export const updateRoom = async (roomId, data) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.put(`/room/update/${roomId}`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getRoomsByAdmin = async (email) => {
+    try {
+        const response = await api_admin.get(`/room/findall/${email}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching rooms:', error);
+    }
+};
+
+// export async function getAllHotels() {
+//     try {
+//       const hotels = await prisma.hotel.findMany({
+//         select: { id: true, name: true },
+//       });
+//       return NextResponse.json(hotels);
+//     } catch (error) {
+//       return NextResponse.json({ error: "Failed to fetch hotels" }, { status: 500 });
+//     }
+// }
