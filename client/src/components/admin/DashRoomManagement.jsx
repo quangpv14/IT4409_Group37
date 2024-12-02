@@ -3,6 +3,8 @@ import axios from "axios";
 import { FiSearch } from 'react-icons/fi';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { IoCheckmarkCircle } from "react-icons/io5";
+import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+
 import { useSelector } from 'react-redux';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { app, storage } from '../../firebaseConfig';
@@ -39,6 +41,8 @@ const DashRoomManagement = () => {
     description: "",
     price: 199000,
     paths: [],
+    hotelName: "",
+    hotelId: "",
   });
 
   const handleFileChange = (e) => {
@@ -105,6 +109,7 @@ const DashRoomManagement = () => {
   };
 
   const handleEdit = (room) => {
+    setFormData(room);
     setSelectedRoom(room);
     setShowEditDialog(true);
   };
@@ -185,26 +190,30 @@ const DashRoomManagement = () => {
   }, []);
 
   // Gọi API khi trang thay đổi hoặc size thay đổi
-  const hotelIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  let params = {
-    hotelIds: hotelIds,
-    page: page,
-    size: 5,
-  };
+
   useEffect(() => {
-    const getRooms = async () => {
-      try {
-        const response = await fetchRooms(params);
-        setRoomManagers(response.data.content);
-        setTotalPages(response.data.totalPages);
-      } catch (error) {
-        console.log("Error fetching rooms:", error);
-      }
+    let hotelIds = hotels?.map((hotel) => hotel.id) || [];
+    let params = {
+      hotelIds: hotelIds,
+      page: page,
+      size: 1,
+      keyword: '',
     };
+    if (hotelIds.length > 0) {
+      const getRooms = async () => {
+        try {
+          const response = await fetchRooms(params);
+          setRoomManagers(response.data.content);
+          setTotalPages(response.data.totalPages);
+        } catch (error) {
+          console.log("Error fetching rooms:", error);
+        }
+      };
 
-    getRooms();
+      getRooms();
+    }
 
-  }, []);
+  }, [hotels]);
 
   // Hàm xử lý khi thay đổi trang
   const handlePageChange = (newPage) => {
@@ -261,10 +270,10 @@ const DashRoomManagement = () => {
                 }}
               >
                 <td style={{ border: "1px solid gray", textAlign: "center" }}>{index + 1}</td>
-                <td style={{ border: "1px solid gray" }}>{room.number}</td>
-                <td style={{ border: "1px solid gray" }}>{room.number}</td>
-                <td style={{ border: "1px solid gray" }}>{room.price}</td>
-                <td style={{ border: "1px solid gray" }}>{room.description}</td>
+                <td style={{ border: "1px solid gray", maxWidth: '45px', minWidth: '45px' }}>{room.number}</td>
+                <td style={{ maxWidth: "220px" }} className="ellipse-text">{room.hotelName}</td>
+                <td style={{ border: "1px solid gray", minWidth: '100px' }}>{room.price} VND</td>
+                <td style={{ maxWidth: "220px" }} className="ellipse-text">{room.description}</td>
                 <td style={{ border: "1px solid gray" }}>{room.roomType}</td>
                 <td style={{ border: "1px solid gray", textAlign: "center", padding: "2px" }}>
                   {/* Edit Button */}
@@ -304,11 +313,20 @@ const DashRoomManagement = () => {
         </table>
 
         {/* Phần phân trang */}
-        <div>
-          <button onClick={() => handlePageChange(page - 1)} disabled={page === 0}>Previous</button>
-          <span> {page + 1} / {totalPages}</span>
-          <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1}>Next</button>
-        </div>
+        {totalPages > 0 && (
+          <div style={{ marginTop: '15px', justifyContent: 'center' }} className="search-area">
+            <button onClick={() => handlePageChange(page - 1)} disabled={page === 0}
+              style={{ background: "none", border: "none", cursor: page === 0 ? "not-allowed" : "pointer" }}>
+              <MdArrowBackIos size={16} color={page === 0 ? "gray" : "black"} />
+            </button>
+            <span> {page + 1} / {totalPages}</span>
+            <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages - 1}
+              style={{ background: "none", border: "none", cursor: page === totalPages - 1 ? "not-allowed" : "pointer" }}
+            >
+              <MdArrowForwardIos size={16} color={page === totalPages - 1 ? "gray" : "black"} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Show the create or edit dialog */}
@@ -316,9 +334,10 @@ const DashRoomManagement = () => {
         <Modal size='lg' backdrop="static" show={showCreateDialog || showEditDialog} onHide={() => {
           setShowCreateDialog(false);
           setShowEditDialog(false);
+          setSelectedHotelId("");
         }}>
           <Modal.Header closeButton style={{ padding: '12px' }}>
-            <Modal.Title>{showCreateDialog ? "Create Room" : `Edit Room: ${selectedRoom?.name}`}</Modal.Title>
+            <Modal.Title>{showCreateDialog ? "Create Room" : `Edit Room`}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
@@ -328,21 +347,32 @@ const DashRoomManagement = () => {
                 <div style={{ width: '50%' }}>
                   <Form.Group controlId="formChooseHotel " style={{ flex: 1 }} >
                     <Form.Label>Choose the hotel</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={selectedHotelId}
-                      onChange={(e) => setSelectedHotelId(e.target.value)}
-                      required
-                    >
-                      <option value="">
-                        Select a hotel
-                      </option>
-                      {hotels.map((hotel) => (
-                        <option key={hotel.id} value={hotel.id}>
-                          {hotel.name}
-                        </option>
-                      ))}
-                    </Form.Control>
+                    {showCreateDialog ? (
+                      <Form.Control
+                        as="select"
+                        value={selectedHotelId}
+                        onChange={(e) => setSelectedHotelId(e.target.value)}
+                        required
+                      >
+                        <option value="">Select a hotel</option>
+                        {hotels.map((hotel) => (
+                          <option key={hotel.id} value={hotel.id}>
+                            {hotel.name}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    ) : (
+                      <Form.Control
+                        as="input"
+                        value={hotels.find((hotel) => hotel.id === selectedRoom.hotelId)?.name || ""}
+                        readOnly
+                        style={{
+                          backgroundColor: "#e9ecef",
+                          border: "1px solid #ced4da",
+                          cursor: "not-allowed",
+                        }}
+                      />
+                    )}
                   </Form.Group>
                 </div>
                 <div style={{ width: '50%' }}>

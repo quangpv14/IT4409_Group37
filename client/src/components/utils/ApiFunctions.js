@@ -200,7 +200,7 @@ export const updateRoom = async (roomId, data) => {
 export const fetchRooms = async (param) => {
     const token = localStorage.getItem("token");
     try {
-        const response = await api_admin.post("/rooms/by-hotels", param, {
+        const response = await api_admin.post("/hotel/rooms", param, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
