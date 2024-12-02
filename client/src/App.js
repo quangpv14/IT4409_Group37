@@ -14,7 +14,7 @@ import { AuthProvider } from "./components/auth/AuthProvider.jsx";
 import Profile from "./components/auth/Profile.jsx";
 import OnlyAdminPrivateRoute from "./components/auth/OnlyAdminPrivateRoute.jsx";
 import { AdminLayout } from './components/admin/AdminLayout.jsx';
-
+import HotelDetails from './components/bookings/HotelDetails.jsx';
 function App() {
   const location = useLocation();
 
@@ -31,7 +31,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
 
         <Route path="/rental-register" element={<RentalRegister />} />
-
+        <Route path="/hotel/:hotelId" element={<HotelDetails />} />
         <Route element={<OnlyAdminPrivateRoute />}>
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>

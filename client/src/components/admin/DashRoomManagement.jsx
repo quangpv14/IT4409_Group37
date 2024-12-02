@@ -176,6 +176,7 @@ const DashRoomManagement = () => {
   useEffect(() => {
     // Gọi hàm getAllRooms khi component mount
     const fetchData = async () => {
+      setLoading(true);
       try {
 
         // Lấy danh sách khách sạn
@@ -184,6 +185,8 @@ const DashRoomManagement = () => {
       } catch (err) {
         setErrorLoading('Failed to fetch hotels');
         setTimeout(() => setErrorLoading(""), 2000);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -201,12 +204,15 @@ const DashRoomManagement = () => {
     };
     if (hotelIds.length > 0) {
       const getRooms = async () => {
+        setLoading(true);
         try {
           const response = await fetchRooms(params);
           setRoomManagers(response.data.content);
           setTotalPages(response.data.totalPages);
         } catch (error) {
           console.log("Error fetching rooms:", error);
+        } finally {
+          setLoading(false);
         }
       };
 
