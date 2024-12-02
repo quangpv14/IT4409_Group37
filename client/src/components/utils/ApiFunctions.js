@@ -206,13 +206,13 @@ export const getRoomsByAdmin = async (email) => {
     }
 };
 
-// export async function getAllHotels() {
-//     try {
-//       const hotels = await prisma.hotel.findMany({
-//         select: { id: true, name: true },
-//       });
-//       return NextResponse.json(hotels);
-//     } catch (error) {
-//       return NextResponse.json({ error: "Failed to fetch hotels" }, { status: 500 });
-//     }
-// }
+/** Hàm xử lý lỗi */
+const handleError = (error) => {
+    if (error.response && error.response.data) {
+        console.error('Error response:', error.response.data);
+        throw new Error(error.response.data.message || 'An error occurred');
+    } else {
+        console.error('Error:', error.message);
+        throw new Error('An unexpected error occurred');
+    }
+};
