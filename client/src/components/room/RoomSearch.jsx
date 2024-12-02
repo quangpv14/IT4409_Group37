@@ -88,8 +88,8 @@ export const RoomSearch = () => {
                         </Col>
 
                         <Col xs={12} md={3}>
-                            <FormGroup controlId='checkOut'>
-                                <FormLabel></FormLabel>
+                            <FormGroup controlId='search'>
+                                <FormLabel style={{ marginLeft: '6px' }}>Find</FormLabel>
                                 <div className='d-flex'>
                                     &nbsp;<Button style={{ height: "50px", width: '100px' }} type='submit'>Search</Button>
                                 </div>

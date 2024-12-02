@@ -21,7 +21,7 @@ const HotelList = () => {
         }
       } catch (err) {
         setError("Failed to fetch hotels. Please try again later.");
-        console.error(err);
+        console.log(err);
       } finally {
         setLoading(false);
       }

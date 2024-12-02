@@ -434,7 +434,7 @@ const DashHotelManagement = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <h6 style={{ marginTop: '8px' }}>{showEditDialog ? "Hotel update successful!" : "Hotel created successfully!"}</h6>
+          <h6 style={{ marginTop: '8px' }}>{showEditDialog ? "Hotel update successfully!" : "Hotel created successfully!"}</h6>
         </Modal.Body>
         <Modal.Footer style={{ padding: '0px', backgroundColor: '#EEEEEE' }}>
           <div className="btn-center" style={{ padding: '1px 0px', backgroundColor: '#f5f5f6' }}>

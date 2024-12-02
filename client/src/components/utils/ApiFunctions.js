@@ -166,10 +166,10 @@ export const getHotelsByAdmin = async (email) => {
 };
 
 // Function to create a room
-export const createRoom = async (data) => {
+export const createRoom = async (id, data) => {
     const token = localStorage.getItem("token");
     try {
-        const response = await api_admin.post('/room/register', data, {
+        const response = await api_admin.post(`/rooms/create/${Number(id)}`, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -185,7 +185,7 @@ export const createRoom = async (data) => {
 export const updateRoom = async (roomId, data) => {
     const token = localStorage.getItem("token");
     try {
-        const response = await api_admin.put(`/room/update/${roomId}`, data, {
+        const response = await api_admin.put(`/rooms/update/${roomId}`, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -197,22 +197,29 @@ export const updateRoom = async (roomId, data) => {
     }
 };
 
+export const fetchRooms = async (param) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.post("/rooms/by-hotels", param, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 export const getRoomsByAdmin = async (email) => {
     try {
         const response = await api_admin.get(`/room/findall/${email}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching rooms:', error);
+        console.log('Error fetching rooms:', error);
     }
 };
 
-/** Hàm xử lý lỗi */
-const handleError = (error) => {
-    if (error.response && error.response.data) {
-        console.error('Error response:', error.response.data);
-        throw new Error(error.response.data.message || 'An error occurred');
-    } else {
-        console.error('Error:', error.message);
-        throw new Error('An unexpected error occurred');
-    }
-};
