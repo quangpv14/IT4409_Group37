@@ -25,7 +25,7 @@ const HotelCard = ({ hotel }) => {
         }}
       >
         {imageUrl ? (
-          <Card.Img variant="top" src={imageUrl} alt={`${hotel.name}`} style={{ height: '180px' }} />
+          <img variant="top" src={imageUrl} alt={`${hotel.name}`} style={{ height: '180px' }} />
         ) : (
           <span style={{ color: '#6c757d' }}>No Image Available</span>
         )}

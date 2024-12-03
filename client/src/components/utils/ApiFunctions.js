@@ -223,3 +223,18 @@ export const getRoomsByAdmin = async (email) => {
     }
 };
 
+export const getHotelById = async (id) => {
+    try {
+        const response = await api_admin.get(`/hotel/${id}`);
+        console.log('API response:', response); // Kiểm tra phản hồi
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error(`Unexpected response status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error("Error fetching hotel details:", error.message);
+        throw new Error("Failed to fetch hotel details. Please try again later.");
+    }
+};
+
