@@ -239,6 +239,15 @@ export const getRoomsByAdmin = async (email) => {
     }
 };
 
+export const getRoomsOfHotel = async (hotelId) => {
+    try {
+        const response = await api_admin.get(`/hotel/get-all-room/${hotelId}`);
+        return response.data;
+    } catch (error) {
+        console.log('Error fetching rooms:', error);
+    }
+};
+
 export const getHotelById = async (id) => {
     try {
         const response = await api_admin.get(`/hotel/${id}`);

@@ -45,7 +45,7 @@ export const NavBar = () => {
                             </li>
                         )}
                         <li className='nav-item'>
-                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Help & Support</NavLink>
+                            <NavLink to='/help' className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Help & Support</NavLink>
                         </li>
                         <li className='nav-item dropdown'>
                             <a className={`text-reset nav-link dropdown-toggle ${showAccount ? "show" : ""}`}

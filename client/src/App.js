@@ -4,6 +4,7 @@ import "/node_modules/bootstrap/dist/js/bootstrap.min.js";
 
 import './App.css';
 import { Home } from "./components/home/Home.jsx";
+import { Help } from "./components/home/pages/Help.jsx"
 import { NavBar } from "./components/layout/NavBar.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
 import { Dashboard } from "./components/admin/Dashboard.jsx";
@@ -29,6 +30,7 @@ function App() {
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/help" element={<Help />} />
 
         <Route path="/rental-register" element={<RentalRegister />} />
         <Route path="/hotel/:hotelId" element={<HotelDetails />} />
