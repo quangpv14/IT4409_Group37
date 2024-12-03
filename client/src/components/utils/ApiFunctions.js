@@ -197,6 +197,22 @@ export const updateRoom = async (roomId, data) => {
     }
 };
 
+// Function to update room details
+export const deleteRoom = async (roomId, hotelId) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.delete(`/hotel/${hotelId}/rooms/delete/${roomId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const fetchRooms = async (param) => {
     const token = localStorage.getItem("token");
     try {

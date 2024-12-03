@@ -7,7 +7,7 @@ import { clearUser } from '../../store/userSlice';
 export const Logout = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
-  const { email, name, isAuthenticated } = useSelector((state) => state.user);
+  const { email, name, isAdmin } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -19,6 +19,18 @@ export const Logout = () => {
 
   return (
     <>
+      {isAdmin && (
+        <div>
+          <li>
+            <Link className="dropdown-item" to={"/dashboard"}>
+              Dashboard
+            </Link>
+          </li>
+          <li>
+            <hr className="dropdown-divider" />
+          </li>
+        </div>
+      )}
       <li>
         <Link className="dropdown-item" to={"/profile"}>
           Profile

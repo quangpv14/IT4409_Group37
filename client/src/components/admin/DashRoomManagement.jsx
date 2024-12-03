@@ -10,7 +10,8 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { app, storage } from '../../firebaseConfig';
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { createRoom, updateRoom, getRoomsByAdmin, fetchRooms } from "../utils/ApiFunctions";
-import { createHotel, updateHotel, getHotelsByAdmin } from "../utils/ApiFunctions";
+import { createHotel, updateHotel, getHotelsByAdmin, deleteRoom } from "../utils/ApiFunctions";
+import { asyncThunkCreator } from "@reduxjs/toolkit";
 
 const DashRoomManagement = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -20,7 +21,7 @@ const DashRoomManagement = () => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorLoading, setErrorLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [keyword, setKeyword] = useState('');
   const [roomManagers, setRoomManagers] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const { email, isAdmin } = useSelector((state) => state.user);
@@ -96,6 +97,37 @@ const DashRoomManagement = () => {
     });
   };
 
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      // Gọi API lấy danh sách khách sạn
+      const hotelData = await getHotelsByAdmin(email);
+      setHotels(hotelData);
+
+      // Chỉ gọi API lấy phòng khi có danh sách khách sạn
+      if (hotelData?.length > 0) {
+        const hotelIds = hotelData.map((hotel) => hotel.id);
+        const params = {
+          hotelIds: hotelIds,
+          page: page,
+          size: 1,
+          keyword: keyword,
+        };
+
+        const response = await fetchRooms(params);
+        setRoomManagers(response.data.content);
+        setTotalPages(response.data.totalPages);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorLoading("Failed to fetch data");
+      setTimeout(() => setErrorLoading(""), 2000);
+    } finally {
+      setLoading(false);
+    }
+
+  };
+
   const handleCreate = () => {
     setSelectedHotelId("");
     setFormData({
@@ -148,10 +180,41 @@ const DashRoomManagement = () => {
 
   };
 
-  const handleSuccessDialogClose = () => {
+  const fetchHotelsAndRooms = async () => {
+    setLoading(true);
+    try {
+      // Gọi API lấy danh sách khách sạn
+      const hotelData = await getHotelsByAdmin(email);
+      setHotels(hotelData);
+
+      // Chỉ gọi API lấy phòng khi có danh sách khách sạn
+      if (hotelData?.length > 0) {
+        const hotelIds = hotelData.map((hotel) => hotel.id);
+        const params = {
+          hotelIds: hotelIds,
+          page: page,
+          size: 1,
+          keyword: '',
+        };
+
+        const response = await fetchRooms(params);
+        setRoomManagers(response.data.content);
+        setTotalPages(response.data.totalPages);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorLoading("Failed to fetch data");
+      setTimeout(() => setErrorLoading(""), 2000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuccessDialogClose = async () => {
     setShowSuccessDialog(false);
     setShowCreateDialog(false);
     setShowEditDialog(false);
+    await fetchHotelsAndRooms();
   };
 
   const handleDelete = (room) => {
@@ -166,10 +229,22 @@ const DashRoomManagement = () => {
   };
 
   // Hàm xóa phòng
-  const confirmDelete = (room) => {
+  const confirmDelete = async (room) => {
 
-    setShowDeleteDialog(false);  // Đóng modal sau khi xóa
-    setSelectedRoom(null);  // Reset selectedRoom
+    setLoading(true);
+    try {
+      // Gọi API để xóa phòng
+      await deleteRoom(room.id, room.hotelId);
+      setShowDeleteDialog(false);
+      setSelectedRoom(null);
+      await fetchHotelsAndRooms();
+    } catch (error) {
+      console.log("Error deleting room:", error);
+      setErrorLoading("Failed to delete room");
+      setTimeout(() => setErrorLoading(""), 2000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Lấy dữ liệu từ API
@@ -238,9 +313,13 @@ const DashRoomManagement = () => {
           <input type="text" placeholder="Search rooms..."
             className="room-search"
             style={{ flex: 1, padding: '0.5rem', borderRadius: '90px', border: '1px solid #ccc' }}
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
           />
           {/* Search Button with React Icon */}
-          <button className="btn btn-search" style={{ marginLeft: '5px', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center' }}>
+          <button className="btn btn-search"
+            style={{ marginLeft: '5px', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center' }}
+            onClick={handleSearch} >
             <FiSearch size={18} />
             <span style={{ marginLeft: '5px' }}>Search</span>
           </button>
@@ -510,13 +589,13 @@ const DashRoomManagement = () => {
 
       {/* Modal xác nhận xóa */}
       <Modal show={showDeleteDialog} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton style={{ padding: '8px' }}>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           Are you sure you want to delete the room <strong>{selectedRoom?.name}</strong>?
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{ padding: '1px' }}>
           <Button variant="danger" onClick={() => confirmDelete(selectedRoom)}>
             Delete
           </Button>
