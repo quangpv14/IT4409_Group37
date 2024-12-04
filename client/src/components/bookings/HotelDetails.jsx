@@ -3,14 +3,14 @@ import { useParams } from "react-router-dom";
 import { getHotelById, getRoomsOfHotel } from "../utils/ApiFunctions";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaCheck, FaTimes } from 'react-icons/fa';
-import {GoSignIn, GoSignOut} from "react-icons/go";
+import { GoSignIn, GoSignOut } from "react-icons/go";
 import { BsInfoCircle } from "react-icons/bs";
 import { MdFamilyRestroom } from "react-icons/md";
 import { IoManOutline } from "react-icons/io5";
 import { MdOutlinePets } from "react-icons/md";
 import { CiCreditCard1 } from "react-icons/ci";
 import { LuPartyPopper } from "react-icons/lu";
-import HotelList from '../home/hotelList';
+import RecentHotel from '../home/RecentHotel';
 
 const HotelDetails = () => {
     const { hotelId } = useParams();
@@ -98,53 +98,53 @@ const HotelDetails = () => {
     };
 
     const outerContainerStyle = {
-      border: "1px solid #ccc", // Viền cho thẻ lớn
-      borderRadius: "8px", // Góc tròn
-      padding: "16px", // Khoảng cách bên trong
-      margin: "16px 0", // Khoảng cách bên ngoài
-      backgroundColor: "#f9f9f9", // Màu nền nhẹ
+        border: "1px solid #ccc", // Viền cho thẻ lớn
+        borderRadius: "8px", // Góc tròn
+        padding: "16px", // Khoảng cách bên trong
+        margin: "16px 0", // Khoảng cách bên ngoài
+        backgroundColor: "#f9f9f9", // Màu nền nhẹ
     };
 
     const dividerStyle = {
-      height: "1px", // Độ dày vách ngăn
-      backgroundColor: "#ddd", // Màu vách ngăn
-      margin: "16px 0", // Khoảng cách trên và dưới
+        height: "1px", // Độ dày vách ngăn
+        backgroundColor: "#ddd", // Màu vách ngăn
+        margin: "16px 0", // Khoảng cách trên và dưới
     };
 
     const containerStyle = {
-      display: "flex",
-      alignItems: "flex-start", // Căn các nội dung bắt đầu từ trên cùng
-      justifyContent: "space-between", // Chia đều hai cột
-      gap: "16px", // Khoảng cách giữa các cột
+        display: "flex",
+        alignItems: "flex-start", // Căn các nội dung bắt đầu từ trên cùng
+        justifyContent: "space-between", // Chia đều hai cột
+        gap: "16px", // Khoảng cách giữa các cột
     };
 
     const IconStyle = {
-      marginRight: '8px',
+        marginRight: '8px',
     };
 
     const h6Style = {
-      flex: "1", // Chiếm toàn bộ cột bên trái
-      margin: "0", // Loại bỏ margin
+        flex: "1", // Chiếm toàn bộ cột bên trái
+        margin: "0", // Loại bỏ margin
     };
-    
+
     const pStyle = {
-      flex: "2", // Chiếm toàn bộ cột bên phải
-      margin: "0", // Loại bỏ margin
+        flex: "2", // Chiếm toàn bộ cột bên phải
+        margin: "0", // Loại bỏ margin
     };
 
     const pContainerStyle = {
-      flex: "2", // Cột bên phải
-      display: "flex",
-      flexDirection: "column", // Đặt các <p> theo chiều dọc
-      gap: "8px", // Khoảng cách giữa các <p>
+        flex: "2", // Cột bên phải
+        display: "flex",
+        flexDirection: "column", // Đặt các <p> theo chiều dọc
+        gap: "8px", // Khoảng cách giữa các <p>
     };
 
     const HotelListStyle = {
-      display: "flex", // Hiển thị ảnh theo dạng hàng ngang hoặc cột
-      flexWrap: "wrap", // Tự động xuống dòng nếu không đủ chỗ
-      gap: "16px", // Khoảng cách giữa các ảnh
-      justifyContent: "center", // Căn giữa ảnh trong container
-      alignItems: "center", // Căn giữa theo trục dọc
+        display: "flex", // Hiển thị ảnh theo dạng hàng ngang hoặc cột
+        flexWrap: "wrap", // Tự động xuống dòng nếu không đủ chỗ
+        gap: "16px", // Khoảng cách giữa các ảnh
+        justifyContent: "center", // Căn giữa ảnh trong container
+        alignItems: "center", // Căn giữa theo trục dọc
     };
 
     const facilities = [
@@ -200,7 +200,7 @@ const HotelDetails = () => {
                         className={`buttonStyle ${activeButton === 'rule' ? 'active' : ''}`}>Rule</button>
                 </div>
             </div>
-            <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 120px" }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px 120px" }}>
                 <div >
                     <h5 style={{ textAlign: "left", marginBottom: "10px" }} id='overview'>
                         {hotel.name || "N/A"}
@@ -571,79 +571,79 @@ const HotelDetails = () => {
                     <p>Get special requests - add in the next step!</p>
                     <div style={outerContainerStyle}>
 
-                      <div style={containerStyle}>
-                        <h6 style={h6Style}>
-                            <GoSignIn style={IconStyle} />Nhận phòng
-                          </h6>
-                          <p style={pStyle}>Từ 14:00 - 23:00</p>
-                      </div>
-                      <div style={dividerStyle}></div>
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <GoSignIn style={IconStyle} />Nhận phòng
+                            </h6>
+                            <p style={pStyle}>Từ 12:00 - 23:00</p>
+                        </div>
+                        <div style={dividerStyle}></div>
 
-                      <div style={containerStyle}>
-                        <h6 style={h6Style}>
-                          <GoSignOut style={IconStyle} />Trả phòng
-                        </h6>
-                        <p style={pStyle}>Từ 08:00 - 12:00</p>
-                      </div>
-                      <div style={dividerStyle}></div>
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <GoSignOut style={IconStyle} />Trả phòng
+                            </h6>
+                            <p style={pStyle}>Từ 08:00 - 12:00</p>
+                        </div>
+                        <div style={dividerStyle}></div>
 
-                      <div style={containerStyle}>
-                        <h6 style={h6Style}>
-                            <BsInfoCircle style={IconStyle}/>Hủy đặt phòng/ Trả trước
-                          </h6>
-                          <p style={pStyle}>Các chính sách hủy và thanh toán trước sẽ khác nhau tùy vào từng chỗ nghỉ. Vui lòng kiểm tra các điều khoản được áp dụng cho mỗi lựa chọn của bạn.</p>
-                      </div>
-                      <div style={dividerStyle}></div>
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <BsInfoCircle style={IconStyle} />Hủy đặt phòng/ Trả trước
+                            </h6>
+                            <p style={pStyle}>Các chính sách hủy và thanh toán trước sẽ khác nhau tùy vào từng chỗ nghỉ. Vui lòng kiểm tra các điều khoản được áp dụng cho mỗi lựa chọn của bạn.</p>
+                        </div>
+                        <div style={dividerStyle}></div>
 
-                      <div style={containerStyle}>
-                        <h6 style={h6Style}>
-                          <MdFamilyRestroom style={IconStyle} />Trẻ em và giường
-                        </h6>
-                          <div style={pContainerStyle}>
-                            <p style={pStyle}> <strong>Chính sách cho trẻ em.</strong> </p>
-                            <p style={pStyle}>Để xem thông tin giá và tình trạng phòng chính xác, vui lòng thêm tuổi và số lượng trẻ em trong nhóm của bạn khi tìm kiếm.</p>
-                            <p style={pStyle}> <strong>Chính sách nội (cùi) và giường phụ</strong> </p>
-                            <p style={pStyle}>Chỗ nghỉ này không cung cấp/cùi và giường phụ.</p>
-                          </div>
-                      </div>
-                      <div style={dividerStyle}></div>
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <MdFamilyRestroom style={IconStyle} />Trẻ em và giường
+                            </h6>
+                            <div style={pContainerStyle}>
+                                <p style={pStyle}> <strong>Chính sách cho trẻ em.</strong> </p>
+                                <p style={pStyle}>Để xem thông tin giá và tình trạng phòng chính xác, vui lòng thêm tuổi và số lượng trẻ em trong nhóm của bạn khi tìm kiếm.</p>
+                                <p style={pStyle}> <strong>Chính sách nội (cùi) và giường phụ</strong> </p>
+                                <p style={pStyle}>Chỗ nghỉ này không cung cấp/cùi và giường phụ.</p>
+                            </div>
+                        </div>
+                        <div style={dividerStyle}></div>
 
-                    <div style={containerStyle}>
-                      <h6 style={h6Style}>
-                          <IoManOutline style={IconStyle} />Không giới hạn độ tuổi
-                        </h6>
-                        <p style={pStyle}>Không có yêu cầu về độ tuổi khi nhận phòng.</p>
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <IoManOutline style={IconStyle} />Không giới hạn độ tuổi
+                            </h6>
+                            <p style={pStyle}>Không có yêu cầu về độ tuổi khi nhận phòng.</p>
+                        </div>
+                        <div style={dividerStyle}></div>
+
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <MdOutlinePets style={IconStyle} />Vật nuôi
+                            </h6>
+                            <p style={pStyle}>Vật nuôi không được phép.</p>
+                        </div>
+                        <div style={dividerStyle}></div>
+
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <CiCreditCard1 style={IconStyle} />Chỉ thanh toán bằng tiền mặt
+                            </h6>
+                            <p style={pStyle}>Chỗ nghỉ này chỉ chấp nhận thanh toán bằng tiền mặt.</p>
+                        </div>
+                        <div style={dividerStyle}></div>
+
+                        <div style={containerStyle}>
+                            <h6 style={h6Style}>
+                                <LuPartyPopper style={IconStyle} />Tiệc tùng
+                            </h6>
+                            <p style={pStyle}>Không cho phép tổ chức tiệc tùng/sự kiện.</p>
+                        </div>
                     </div>
-                    <div style={dividerStyle}></div>
-
-                    <div style={containerStyle}>
-                      <h6 style={h6Style}>
-                          <MdOutlinePets style={IconStyle} />Vật nuôi
-                        </h6>
-                        <p style={pStyle}>Vật nuôi không được phép.</p>
-                    </div>
-                    <div style={dividerStyle}></div>
-
-                    <div style={containerStyle}>
-                        <h6 style={h6Style}>
-                          <CiCreditCard1 style={IconStyle} />Chỉ thanh toán bằng tiền mặt
-                        </h6>
-                        <p style={pStyle}>Chỗ nghỉ này chỉ chấp nhận thanh toán bằng tiền mặt.</p>
-                    </div>
-                    <div style={dividerStyle}></div>
-
-                    <div style={containerStyle}>
-                      <h6 style={h6Style}>
-                        <LuPartyPopper style={IconStyle} />Tiệc tùng
-                      </h6>
-                      <p style={pStyle}>Không cho phép tổ chức tiệc tùng/sự kiện.</p>
-                    </div>     
                 </div>
-              </div>
-              <h5>Những điểm hấp dẫn gần đây</h5>
-              <section className='container'>
-                <HotelList/>
-              </section>
+                <h5 style={{ marginBottom: '16px' }}>Recent attractions</h5>
+                <section>
+                    <RecentHotel />
+                </section>
             </div>
         </div>
     );
