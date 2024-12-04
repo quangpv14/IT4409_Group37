@@ -36,7 +36,7 @@ export const NavBar = () => {
                             <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>About</NavLink>
                         </li>
                         <li className='nav-item'>
-                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
+                            <NavLink to='Contact' className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
                         </li>
                         {!isLoggedIn && (
                             <li className='nav-item'>

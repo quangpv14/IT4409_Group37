@@ -4,6 +4,7 @@ import "/node_modules/bootstrap/dist/js/bootstrap.min.js";
 
 import './App.css';
 import { Home } from "./components/home/Home.jsx";
+import { Contact} from "./components/home/pages/Contact.jsx"
 import { Help } from "./components/home/pages/Help.jsx"
 import { NavBar } from "./components/layout/NavBar.jsx";
 import { Footer } from "./components/layout/Footer.jsx";
@@ -16,6 +17,7 @@ import Profile from "./components/auth/Profile.jsx";
 import OnlyAdminPrivateRoute from "./components/auth/OnlyAdminPrivateRoute.jsx";
 import { AdminLayout } from './components/admin/AdminLayout.jsx';
 import HotelDetails from './components/bookings/HotelDetails.jsx';
+
 function App() {
   const location = useLocation();
 
@@ -30,6 +32,7 @@ function App() {
         <Route path="/login" element={<SignIn />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/help" element={<Help />} />
 
         <Route path="/rental-register" element={<RentalRegister />} />
