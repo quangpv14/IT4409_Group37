@@ -476,3 +476,23 @@ h2 {
 .faq-title span {
   margin: 0;
 }
+
+.buttonStyle {
+  padding: 10px 20px;
+  border-right: solid 1px gray;
+  cursor: pointer;
+  font-size: 14px;
+  width: 16.66%;
+  border: solid 1px white;
+}
+
+.buttonStyle:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.buttonStyle.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
