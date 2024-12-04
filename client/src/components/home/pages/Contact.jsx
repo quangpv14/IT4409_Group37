@@ -89,7 +89,7 @@ export const Contact = () => {
             </div>
             <div style={styles.item}>
               <i className="fas fa-map-marker-alt" style={styles.icon}></i>
-              <span>Địa chỉ: 123 Đường ABC, TP.HCM, Việt Nam</span>
+              <span>Địa chỉ: 123 Đường ABC, Hà Nội, Việt Nam</span>
             </div>
           </div>
           <form style={styles.form}>

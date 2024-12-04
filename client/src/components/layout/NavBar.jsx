@@ -33,7 +33,7 @@ export const NavBar = () => {
                     </ul>
                     <ul className='d-flex navbar-nav'>
                         <li className='nav-item'>
-                            <NavLink className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>About</NavLink>
+                            <NavLink to='About' className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>About</NavLink>
                         </li>
                         <li className='nav-item'>
                             <NavLink to='Contact' className={({ isActive }) => (isActive ? 'nav-link active-link' : 'nav-link')}>Contact</NavLink>
