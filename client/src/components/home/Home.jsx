@@ -3,6 +3,7 @@ import { Header } from '../layout/Header';
 import { RoomSearch } from '../room/RoomSearch';
 import { useSelector } from 'react-redux';
 import HotelList from './hotelList';
+import TrendingDestinations from './TrendingDestinations';
 
 export const Home = () => {
   const { email, name, isAuthenticated } = useSelector((state) => state.user || {});
@@ -20,7 +21,14 @@ export const Home = () => {
       <Header />
       <section className='container'>
         <RoomSearch />
-        <HotelList />
+        <div>
+          <TrendingDestinations />
+        </div>
+        <div>
+          <h4 style={{ paddingLeft: '12px' }}>Popular destinations</h4>
+          <HotelList />
+        </div>
+
       </section>
     </section>
   )

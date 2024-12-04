@@ -11,6 +11,7 @@ import { MdOutlinePets } from "react-icons/md";
 import { CiCreditCard1 } from "react-icons/ci";
 import { LuPartyPopper } from "react-icons/lu";
 import RecentHotel from '../home/RecentHotel';
+import { Button } from 'react-bootstrap';
 
 const HotelDetails = () => {
     const { hotelId } = useParams();
@@ -20,6 +21,7 @@ const HotelDetails = () => {
     const [error, setError] = useState("");
     const [activeButton, setActiveButton] = useState("overview");
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchHotelDetails = async () => {
             setLoading(true);
             setError(""); // Xóa lỗi trước khi fetch
@@ -167,7 +169,7 @@ const HotelDetails = () => {
     const scrollToSection = (id) => {
         const element = document.getElementById(id);
         if (element) {
-            const top = element.getBoundingClientRect().top + window.pageYOffset;
+            const top = element.getBoundingClientRect().top;
             window.scrollTo({
                 top: top - 70,
                 behavior: 'smooth',
@@ -285,7 +287,7 @@ const HotelDetails = () => {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         width: "100%",
-                        padding: "10px 5px",
+                        padding: "14px 5px",
                         backgroundColor: '#f5f5f5'
                     }}>
                         {facilities.map((facility, index) => (
@@ -294,7 +296,6 @@ const HotelDetails = () => {
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    marginBottom: '8px',
                                 }}
                             >
                                 <span
@@ -304,7 +305,7 @@ const HotelDetails = () => {
                                         fontSize: '18px',
                                     }}
                                 >
-                                    {facility.isAvailable ? <FaCheck /> : ''}
+                                    {facility.isAvailable ? <FaCheck style={{ marginBottom: '5px' }} /> : ''}
                                 </span>
                                 <span>{facility.name}</span>
                             </div>
@@ -317,22 +318,94 @@ const HotelDetails = () => {
                 <div id='room'>
                     <h5 style={{ marginBottom: '16px' }}>Availability</h5>
                     <div style={{ display: 'flex', width: "100%" }}>
-                        {hotel.amenities && hotel.amenities.length > 0 ? (
-                            <ul style={{ paddingLeft: "20px" }}>
-                                {hotel.amenities.map((amenity, index) => (
-                                    <li key={index}>{amenity}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>Không có phòng nào.</p>
-                        )}
-                        {/* chỗ này hiển thị table như ở màn dashHotelManager nhưng chỉ lấy đúng theo thiết kế file excel */}
+                        <table style={{ width: "960px", borderCollapse: "collapse" }}>
+                            <thead style={{ backgroundColor: "#003366", color: "white", border: "1px solid #ccc" }}>
+                                <tr>
+                                    <th style={{ border: "1px solid #ccc" }}>Accommodation Type</th>
+                                    <th style={{ border: "1px solid #ccc" }}>Price Today</th>
+                                    <th style={{ border: "1px solid #ccc" }}>Option</th>
+                                    <th style={{ border: "1px solid #ccc" }}>Book</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {lstRoom && lstRoom.length > 0 ? (
+                                    lstRoom.map((room, index) => (
+                                        <tr
+                                            key={room.id}
+                                        >
+                                            <td style={{ border: "1px solid gray", maxWidth: '400px' }}>
+                                                <div style={{ display: 'flex', width: '380px' }}>
+                                                    {/* Image */}
+                                                    <div style={{ width: '40%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <img
+                                                            src={room.imagePaths[0]}
+                                                            alt={`Room ${room.number}`}
+                                                            style={{ width: "100%", height: "120px", objectFit: "cover", padding: "4px" }}
+                                                        />
+                                                    </div>
+                                                    <div style={{ width: '60%' }}>
+                                                        <div style={{ fontSize: "18px", color: '#003366', fontWeight: '700' }}>{`Number room: ${room.number}`}</div>
+                                                        <div style={{ fontSize: "14px", height: '68px' }}>{room.description}</div>
+                                                        {/* Room number */}
+
+                                                        {/* Room type */}
+                                                        <div style={{ fontSize: "16px" }}>{room.roomType}</div>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                            <td style={{
+                                                border: "1px solid gray",
+                                                maxWidth: "150px",
+                                                minWidth: "100px",
+
+                                            }}>
+                                                <div style={{ display: 'inline-block', marginLeft: '4px' }}>
+                                                    <div style={{ fontWeight: 'bold' }}>{room.price} VND</div>
+                                                    <div style={{ fontSize: '12px' }}>Taxes and fees included</div>
+                                                </div>
+                                            </td>
+                                            <td style={{ border: "1px solid gray", maxWidth: "280px" }}>
+                                                <div style={{ fontSize: '12px' }}>
+                                                    <ul>
+                                                        <li>Includes a great breakfast</li>
+                                                        <li>No credit card required</li>
+                                                        <li>No prepayment required – pay at the property</li>
+                                                    </ul>
+
+                                                </div>
+                                            </td>
+                                            <td style={{ border: "1px solid gray", width: '150px', maxWidth: "160px" }}>
+                                                <div>
+                                                    <Button style={{
+                                                        height: "40px",
+                                                        width: '100px',
+                                                        borderRadius: '5px',
+                                                        fontSize: '14px',
+                                                        marginLeft: '25px'
+                                                    }}
+                                                        type='submit'>
+                                                        I will book
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <div colSpan="4" style={{ padding: "10px", color: "#666" }}>
+                                        No rooms available for booking
+                                    </div>
+                                )}
+
+                            </tbody>
+                        </table>
+
                     </div>
                 </div>
 
 
                 {/* Các tiện nghi */}
-                <div style={{ lineHeight: '1.6' }} id='facility'>
+                <div style={{ lineHeight: '1.6', marginTop: '20px' }} id='facility'>
                     <h5 style={{ fontSize: '1.5em', paddingBottom: '6px' }}>
                         Facilities of the hotel
                     </h5>
@@ -602,8 +675,8 @@ const HotelDetails = () => {
                             <div style={pContainerStyle}>
                                 <p style={pStyle}> <strong>Chính sách cho trẻ em.</strong> </p>
                                 <p style={pStyle}>Để xem thông tin giá và tình trạng phòng chính xác, vui lòng thêm tuổi và số lượng trẻ em trong nhóm của bạn khi tìm kiếm.</p>
-                                <p style={pStyle}> <strong>Chính sách nội (cùi) và giường phụ</strong> </p>
-                                <p style={pStyle}>Chỗ nghỉ này không cung cấp/cùi và giường phụ.</p>
+                                <p style={pStyle}> Chính sách nôi (cũi) và giường phụ </p>
+                                <p style={pStyle}>Chỗ nghỉ này không cung cấp nôi/cũi và giường phụ.</p>
                             </div>
                         </div>
                         <div style={dividerStyle}></div>
@@ -645,7 +718,7 @@ const HotelDetails = () => {
                     <RecentHotel />
                 </section>
             </div>
-        </div>
+        </div >
     );
 };
 
