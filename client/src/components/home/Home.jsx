@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '../layout/Header';
 import { RoomSearch } from '../room/RoomSearch';
 import { useSelector } from 'react-redux';
@@ -7,7 +7,9 @@ import TrendingDestinations from './TrendingDestinations';
 
 export const Home = () => {
   const { email, name, isAuthenticated } = useSelector((state) => state.user || {});
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // if (!isAuthenticated) {
   //   return (
   //     <section className="container text-center">

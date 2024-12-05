@@ -263,3 +263,21 @@ export const getHotelById = async (id) => {
     }
 };
 
+export const findHotels = async (params) => {
+    try {
+        const response = await api.get('/api/hotel/findall', { params });
+        return response;
+    } catch (error) {
+        console.log('Not found hotels:', error);
+        throw error; // Hoặc xử lý lỗi tùy theo logic của bạn
+    }
+};
+
+export const getDestinations = async (params) => {
+    try {
+        const response = await api.get('api/hotel/destination', { params });
+        return response;
+    } catch (error) {
+        console.log('Error fetching destinations:', error);
+    }
+};

@@ -33,7 +33,7 @@ const DashRoomManagement = () => {
   const [selectedHotelId, setSelectedHotelId] = useState(-1);
 
   const [page, setPage] = useState(0); // Trang hiện tại
-  const [size, setSize] = useState(10); // Số lượng phòng mỗi trang
+  const [pageSize, setPageSize] = useState(10); // Số lượng phòng mỗi trang
   const [totalPages, setTotalPages] = useState(0); // Tổng số trang
 
   const [formData, setFormData] = useState({
@@ -110,7 +110,7 @@ const DashRoomManagement = () => {
         const params = {
           hotelIds: hotelIds,
           page: page,
-          size: 1,
+          size: pageSize,
           keyword: keyword,
         };
 
@@ -193,7 +193,7 @@ const DashRoomManagement = () => {
         const params = {
           hotelIds: hotelIds,
           page: page,
-          size: 1,
+          size: pageSize,
           keyword: '',
         };
 
@@ -274,7 +274,7 @@ const DashRoomManagement = () => {
     let params = {
       hotelIds: hotelIds,
       page: page,
-      size: 1,
+      size: pageSize,
       keyword: '',
     };
     if (hotelIds.length > 0) {
@@ -294,7 +294,7 @@ const DashRoomManagement = () => {
       getRooms();
     }
 
-  }, [hotels]);
+  }, [hotels, page]);
 
   // Hàm xử lý khi thay đổi trang
   const handlePageChange = (newPage) => {

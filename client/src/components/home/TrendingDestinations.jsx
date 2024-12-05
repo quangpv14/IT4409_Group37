@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 const TrendingDestinations = () => {
     const navigate = useNavigate();
+    const [address, setAddress] = useState('');
     const destinations = [
         {
             name: 'Ho Chi Minh City',
@@ -24,7 +25,8 @@ const TrendingDestinations = () => {
 
     const handleImageClick = (param) => {
         //navigate(`/destination/${param}`); 
-        navigate(`/about`);
+        setAddress(param);
+        navigate(`/destination/${param}`);
     };
     return (
         <Container style={{ padding: '20px 10px' }}>
