@@ -474,6 +474,13 @@ const HotelDetails = ({onSubmit}) => {
                                             required
                                         />
                                     </Form.Group>
+                                    <div style={{ flex: 1, textAlign: 'left' }}>
+                                        {(!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0) && (
+                                            <p style={{ color: 'red', fontSize: '14px', marginTop: '8px' }}>
+                                                Please select Check-in and Check-out dates.
+                                            </p>
+                                        )}
+                                    </div>
                                     <p><strong>Number of nights:</strong> {calculateNights(checkinDate, checkoutDate)} nights</p>
                                     <p><strong>Price per night:</strong> {selectedRoom?.price} VND</p>
                                     <p><strong>Total Price:</strong> {calculateNights(checkinDate, checkoutDate) * selectedRoom?.price} VND</p>
