@@ -11,15 +11,52 @@ import { MdOutlinePets } from "react-icons/md";
 import { CiCreditCard1 } from "react-icons/ci";
 import { LuPartyPopper } from "react-icons/lu";
 import RecentHotel from '../home/RecentHotel';
-import { Button } from 'react-bootstrap';
+import { Button, Form, Modal } from "react-bootstrap";
+import { useSelector } from 'react-redux';
 
-const HotelDetails = () => {
+const HotelDetails = ({onSubmit}) => {
     const { hotelId } = useParams();
     const [hotel, setHotel] = useState(null);
     const [lstRoom, setLstRoom] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [activeButton, setActiveButton] = useState("overview");
+    const [show, setShow] = useState(false);
+
+    const [formData, setFormData] = useState({
+        roomId: "",
+        email: "",
+    }); 
+
+    const [checkinDate, setCheckinDate] = useState("");
+    const [checkoutDate, setCheckoutDate] = useState("");
+	const [selectedRoom, setSelectedRoom] = useState(null);
+	const handleShow = (room) => {	
+	   setSelectedRoom(room);
+	   setFormData({
+              roomId: room.id, 
+              email: email || "", 
+            });
+            setShow(true);
+    };
+
+    const handleClose = () => {
+       	setShow(false);
+   		setSelectedRoom(null);
+    };
+
+    const handleConfirmBooking = () => {
+        if (onSubmit) {
+            console.log("Room booked!");
+            onSubmit({ ...formData, checkinDate, checkoutDate });
+        } else {
+            console.error("onSubmit function is not defined.");
+        }
+        setShow(false); 
+    };	
+
+    const { email, name} = useSelector((state) => state.user); // lấy ra name, email
+
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchHotelDetails = async () => {
@@ -178,6 +215,14 @@ const HotelDetails = () => {
             setActiveButton(id);
         }
     };
+
+    //hàm tính số đêm
+    function calculateNights(checkinDate, checkoutDate) {
+        const checkin = new Date(checkinDate);
+        const checkout = new Date(checkoutDate);
+        return Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+    }
+    
 
     return (
         <div>
@@ -384,7 +429,8 @@ const HotelDetails = () => {
                                                         fontSize: '14px',
                                                         marginLeft: '25px'
                                                     }}
-                                                        type='submit'>
+                                                        type="button"
+                                                        onClick={() => handleShow(room)}>
                                                         I will book
                                                     </Button>
                                                 </div>
@@ -398,6 +444,53 @@ const HotelDetails = () => {
                                 )}
 
                             </tbody>
+
+                            {/* Modal to display the confirmation dialog */}
+                            <Modal sz='lg' backdrop="static" show={show} onHide={handleClose} centered>
+                                <Modal.Header closeButton style={{ padding: '12px' }}>
+                                    <Modal.Title>Confirm Booking</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <p><strong>Customer Name:</strong> {name}</p>
+                                    <p><strong>Email:</strong> {email}</p>
+                                    <p><strong>Hotel Name:</strong> {hotel.name}</p>
+                                    <p><strong>Room Number:</strong> {selectedRoom?.number}</p> 
+                                    <p><strong>Address:</strong> {hotel.address}</p>
+                                    <Form.Group controlId="checkinDate">
+                                        <Form.Label>Check-in Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            value={checkinDate}
+                                            onChange={(e) => setCheckinDate(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="checkoutDate" style={{ marginTop: '10px' }}>
+                                        <Form.Label>Check-out Date</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            value={checkoutDate}
+                                            onChange={(e) => setCheckoutDate(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                    <p><strong>Number of nights:</strong> {calculateNights(checkinDate, checkoutDate)} nights</p>
+                                    <p><strong>Price per night:</strong> {selectedRoom?.price} VND</p>
+                                    <p><strong>Total Price:</strong> {calculateNights(checkinDate, checkoutDate) * selectedRoom?.price} VND</p>
+                                    </Modal.Body>   
+                                    <Modal.Footer>
+                                        <Button
+                                            variant="primary"
+                                            onClick={handleConfirmBooking}
+                                            disabled={!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0}
+                                        >
+                                            Confirm
+                                        </Button>
+                                        <Button variant="secondary" onClick={handleClose}>
+                                            Cancel
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
                         </table>
 
                     </div>
@@ -459,8 +552,6 @@ const HotelDetails = () => {
                                     <FaCheck style={iconStyle} /> Room service
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
 
@@ -718,7 +809,7 @@ const HotelDetails = () => {
                     <RecentHotel />
                 </section>
             </div>
-        </div >
+        </div>
     );
 };
 
