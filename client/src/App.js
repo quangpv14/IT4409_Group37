@@ -19,6 +19,7 @@ import OnlyAdminPrivateRoute from "./components/auth/OnlyAdminPrivateRoute.jsx";
 import { AdminLayout } from './components/admin/AdminLayout.jsx';
 import HotelDetails from './components/bookings/HotelDetails.jsx';
 import DestinationPage from './components/home/Destination.jsx';
+import BookingHistory from './components/bookings/BookingHistory.jsx';
 function App() {
   const location = useLocation();
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/manager/history" element={<BookingHistory />} />
         <Route path="/destination/:address" element={<DestinationPage />} />
         <Route path="/rental-register" element={<RentalRegister />} />
         <Route path="/hotel/:hotelId" element={<HotelDetails />} />

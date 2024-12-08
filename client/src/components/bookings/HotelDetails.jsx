@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getHotelById, getRoomsOfHotel } from "../utils/ApiFunctions";
+import { getHotelById, getRoomsOfHotel, bookRoom } from "../utils/ApiFunctions";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import { IoCheckmarkCircle } from "react-icons/io5";
 import { GoSignIn, GoSignOut } from "react-icons/go";
 import { BsInfoCircle } from "react-icons/bs";
 import { MdFamilyRestroom } from "react-icons/md";
@@ -13,49 +14,80 @@ import { LuPartyPopper } from "react-icons/lu";
 import RecentHotel from '../home/RecentHotel';
 import { Button, Form, Modal } from "react-bootstrap";
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-const HotelDetails = ({onSubmit}) => {
+const HotelDetails = ({ onSubmit }) => {
     const { hotelId } = useParams();
     const [hotel, setHotel] = useState(null);
     const [lstRoom, setLstRoom] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadingBook, setLoadingBook] = useState(true);
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [error, setError] = useState("");
+    const [errorLogin, setErrorLogin] = useState("");
+    const [errorBook, setErrorBook] = useState("");
     const [activeButton, setActiveButton] = useState("overview");
     const [show, setShow] = useState(false);
-
+    const navigate = useNavigate();
+    const user = useSelector((state) => state.user);
     const [formData, setFormData] = useState({
         roomId: "",
         email: "",
-    }); 
+    });
 
     const [checkinDate, setCheckinDate] = useState("");
     const [checkoutDate, setCheckoutDate] = useState("");
-	const [selectedRoom, setSelectedRoom] = useState(null);
-	const handleShow = (room) => {	
-	   setSelectedRoom(room);
-	   setFormData({
-              roomId: room.id, 
-              email: email || "", 
-            });
-            setShow(true);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const handleShow = (room) => {
+        if (!user.email) {
+            setErrorLogin('Please log in to continue booking room.');
+            setTimeout(() => setErrorLogin(""), 2000);
+            setTimeout(() => navigate("/login"), 3500);
+            return;
+        }
+        setSelectedRoom(room);
+        // setFormData({
+        //     roomId: room.id,
+        //     email: email || "",
+        // });
+        setShow(true);
     };
 
     const handleClose = () => {
-       	setShow(false);
-   		setSelectedRoom(null);
+        setShow(false);
+        setSelectedRoom(null);
     };
 
-    const handleConfirmBooking = () => {
-        if (onSubmit) {
-            console.log("Room booked!");
-            onSubmit({ ...formData, checkinDate, checkoutDate });
-        } else {
-            console.error("onSubmit function is not defined.");
-        }
-        setShow(false); 
-    };	
+    const handleSuccessDialogClose = async () => {
+        setShowSuccessDialog(false);
+        setShow(false);
+        navigate("manager/history")
 
-    const { email, name} = useSelector((state) => state.user); // lấy ra name, email
+    }
+    const handleConfirmBooking = async () => {
+        let param = {
+            roomId: selectedRoom.id,
+            email: email,
+            checkinDate: checkinDate,
+            checkoutDate: checkoutDate,
+        };
+        setLoading(true);
+        bookRoom(param)
+            .then((response) => {
+                // Xử lý khi đặt phòng thành công
+                setShowSuccessDialog(true);
+                //setShow(false);
+
+            })
+            .catch((error) => {
+                // Xử lý khi có lỗi xảy ra
+                setErrorBook('Sorry, this room is no longer available.');
+                setTimeout(() => setErrorBook(""), 2000);
+            })
+            .finally(() => setLoading(false));
+    };
+
+    const { email, name } = useSelector((state) => state.user); // lấy ra name, email
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -69,6 +101,7 @@ const HotelDetails = ({onSubmit}) => {
                 setLstRoom(dataRoom);
             } catch (err) {
                 setError("Không thể tải thông tin khách sạn. Vui lòng thử lại sau.");
+                setTimeout(() => setErrorBook(""), 2000);
                 console.log(err);
             } finally {
                 setLoading(false);
@@ -78,18 +111,18 @@ const HotelDetails = ({onSubmit}) => {
         fetchHotelDetails();
     }, [hotelId]);
 
-    if (loading) {
-        return (
-            <div style={{ textAlign: "center", marginTop: "20px", minHeight: '100vh' }}>
-                {loading && <div className="loading-overlay">Loading...</div>}
-            </div>
-        );
-    }
+    // if (loading) {
+    //     return (
+    //         <div style={{ textAlign: "center", marginTop: "20px", minHeight: '100vh' }}>
+    //             {loading && <div className="loading-overlay">Loading...</div>}
+    //         </div>
+    //     );
+    // }
 
     if (error) {
         return (
-            <div style={{ textAlign: "center", marginTop: "20px", minHeight: '100vh' }}>
-                <p style={{ color: "red" }}>{error}</p>
+            <div style={{ textAlign: "center", marginTop: "20px", minHeight: '56vh' }}>
+                <p style={{ color: "black" }}>{error}</p>
             </div>
         );
     }
@@ -97,7 +130,8 @@ const HotelDetails = ({onSubmit}) => {
     if (!hotel) {
         return (
             <div style={{ textAlign: "center", marginTop: "20px", minHeight: '100vh' }}>
-                <p>Không tìm thấy thông tin khách sạn.</p>
+                {loading && <div className="loading-overlay">Loading...</div>}
+                {/* <p>Không tìm thấy thông tin khách sạn.</p> */}
             </div>
         );
     }
@@ -222,600 +256,651 @@ const HotelDetails = ({onSubmit}) => {
         const checkout = new Date(checkoutDate);
         return Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
     }
-    
+
 
     return (
         <div>
-            <div style={{ width: '100%' }}>
-                <div style={{
-                    display: 'flex', justifyContent: 'space-around',
-                    marginBottom: '10px',
-                    marginTop: '50px',
-                    padding: "0px 205px"
-                }}>
-                    <button onClick={() => scrollToSection('overview')}
-                        className={`buttonStyle ${activeButton === 'overview' ? 'active' : ''}`}>Overview</button>
-                    <button onClick={() => scrollToSection('description')}
-                        className={`buttonStyle ${activeButton === 'description' ? 'active' : ''}`}>Description</button>
-                    <button onClick={() => scrollToSection('popular')}
-                        className={`buttonStyle ${activeButton === 'popular' ? 'active' : ''}`}>Popular</button>
-                    <button onClick={() => scrollToSection('room')}
-                        className={`buttonStyle ${activeButton === 'room' ? 'active' : ''}`}>Available</button>
-                    <button onClick={() => scrollToSection('facility')}
-                        className={`buttonStyle ${activeButton === 'facility' ? 'active' : ''}`}>Facility</button>
-                    <button onClick={() => scrollToSection('rule')}
-                        className={`buttonStyle ${activeButton === 'rule' ? 'active' : ''}`}>Rule</button>
-                </div>
-            </div>
-            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px 120px" }}>
-                <div >
-                    <h5 style={{ textAlign: "left", marginBottom: "10px" }} id='overview'>
-                        {hotel.name || "N/A"}
-                    </h5>
-                    <p style={{ textAlign: "left", marginBottom: "10px", fontSize: '14px' }}>
-                        <FaLocationDot style={{ marginBottom: '5px', marginRight: '5px', color: 'blue' }} />
-                        <strong>Địa chỉ:</strong> {hotel.address || "Không có thông tin"}
-                    </p>
+            {loading && <div className="loading-overlay">Loading...</div>}
+            {hotel ? (
+                <div>
 
-
-                    {/* Bố cục lưới hiển thị hình ảnh */}
-                    <div>
-                        <div
-                            style={{
-                                display: "grid",
-                                gridTemplateColumns: "repeat(3, 1fr)",
-                                gap: "15px",
-                                marginBottom: "20px",
-                            }}
-                        >
-                            {/* Hình lớn */}
-                            <div style={{ gridColumn: "1 / span 2" }}>
-                                <img
-                                    src={hotel.paths[0]}
-                                    alt={hotel.name || "Hotel"}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        borderRadius: "8px",
-                                    }}
-                                />
-                            </div>
-
-                            {/* Hình nhỏ hơn */}
-                            {hotel.paths.slice(1, 5).map((path, index) => (
-                                <img
-                                    key={index}
-                                    src={path}
-                                    alt={`Image ${index + 1}`}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        borderRadius: "8px",
-                                    }}
-                                />
-                            ))}
+                    {errorLogin && <p className="alert alert-warning profile-alert">{errorLogin}</p>}
+                    <div style={{ width: '100%' }}>
+                        <div style={{
+                            display: 'flex', justifyContent: 'space-around',
+                            marginBottom: '10px',
+                            marginTop: '50px',
+                            padding: "0px 205px"
+                        }}>
+                            <button onClick={() => scrollToSection('overview')}
+                                className={`buttonStyle ${activeButton === 'overview' ? 'active' : ''}`}>Overview</button>
+                            <button onClick={() => scrollToSection('description')}
+                                className={`buttonStyle ${activeButton === 'description' ? 'active' : ''}`}>Description</button>
+                            <button onClick={() => scrollToSection('popular')}
+                                className={`buttonStyle ${activeButton === 'popular' ? 'active' : ''}`}>Popular</button>
+                            <button onClick={() => scrollToSection('room')}
+                                className={`buttonStyle ${activeButton === 'room' ? 'active' : ''}`}>Availability</button>
+                            <button onClick={() => scrollToSection('facility')}
+                                className={`buttonStyle ${activeButton === 'facility' ? 'active' : ''}`}>Facility</button>
+                            <button onClick={() => scrollToSection('rule')}
+                                className={`buttonStyle ${activeButton === 'rule' ? 'active' : ''}`}>Rule</button>
                         </div>
                     </div>
-                    <div></div>
-                </div>
-
-                {/* Phần mô tả */}
-                <div id='description'>
-                    <h5 style={{ marginBottom: '16px' }}>Description</h5>
-                    <div style={{ display: 'flex', width: "100%" }}>
-                        <div style={{ width: '80%' }}>
-                            <p style={{ marginRight: '30px', minHeight: '116px', backgroundColor: '#f5f5f5' }}>
-                                {hotel.description || "Không có thông tin mô tả."}
+                    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px 120px" }}>
+                        <div >
+                            <h5 style={{ textAlign: "left", marginBottom: "10px" }} id='overview'>
+                                {hotel.name || "N/A"}
+                            </h5>
+                            <p style={{ textAlign: "left", marginBottom: "10px", fontSize: '14px' }}>
+                                <FaLocationDot style={{ marginBottom: '5px', marginRight: '5px', color: 'blue' }} />
+                                <strong>Địa chỉ:</strong> {hotel.address || "Không có thông tin"}
                             </p>
-                        </div>
-                        <div style={{ width: '20%' }}>
-                            <div style={{ gap: '1rem', marginLeft: '5px', height: '115px', backgroundColor: '#f0f6ff' }}>
-                                <div style={{ flex: 1 }} >
-                                    <div style={{ fontWeight: '500', marginLeft: '10px' }}>Check-in:</div>
-                                    <div style={{ marginLeft: '25px' }}>{hotel.checkin || "Từ 12:00 đến 14:00"}</div>
-                                </div>
-                                <div style={{ flex: 1 }} >
-                                    <div style={{ fontWeight: '500', marginLeft: '10px' }}>Check-out:</div>
-                                    <div style={{ marginLeft: '25px' }}>{hotel.checkout || "Trước 12:00"}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div id='popular'>
-                    <h5 style={{ marginBottom: '16px' }}>Most popular facilities</h5>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: "100%",
-                        padding: "14px 5px",
-                        backgroundColor: '#f5f5f5'
-                    }}>
-                        {facilities.map((facility, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <span
+
+                            {/* Bố cục lưới hiển thị hình ảnh */}
+                            <div>
+                                <div
                                     style={{
-                                        color: facility.isAvailable ? 'green' : 'red',
-                                        marginRight: '8px',
-                                        fontSize: '18px',
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(3, 1fr)",
+                                        gap: "15px",
+                                        marginBottom: "20px",
                                     }}
                                 >
-                                    {facility.isAvailable ? <FaCheck style={{ marginBottom: '5px' }} /> : ''}
-                                </span>
-                                <span>{facility.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <hr style={{ marginTop: '30px' }}></hr>
-                {/* Phần hiển thị room*/}
-                <div id='room'>
-                    <h5 style={{ marginBottom: '16px' }}>Availability</h5>
-                    <div style={{ display: 'flex', width: "100%" }}>
-                        <table style={{ width: "960px", borderCollapse: "collapse" }}>
-                            <thead style={{ backgroundColor: "#003366", color: "white", border: "1px solid #ccc" }}>
-                                <tr>
-                                    <th style={{ border: "1px solid #ccc" }}>Accommodation Type</th>
-                                    <th style={{ border: "1px solid #ccc" }}>Price Today</th>
-                                    <th style={{ border: "1px solid #ccc" }}>Option</th>
-                                    <th style={{ border: "1px solid #ccc" }}>Book</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {lstRoom && lstRoom.length > 0 ? (
-                                    lstRoom.map((room, index) => (
-                                        <tr
-                                            key={room.id}
-                                        >
-                                            <td style={{ border: "1px solid gray", maxWidth: '400px' }}>
-                                                <div style={{ display: 'flex', width: '380px' }}>
-                                                    {/* Image */}
-                                                    <div style={{ width: '40%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <img
-                                                            src={room.imagePaths[0]}
-                                                            alt={`Room ${room.number}`}
-                                                            style={{ width: "100%", height: "120px", objectFit: "cover", padding: "4px" }}
-                                                        />
-                                                    </div>
-                                                    <div style={{ width: '60%' }}>
-                                                        <div style={{ fontSize: "18px", color: '#003366', fontWeight: '700' }}>{`Number room: ${room.number}`}</div>
-                                                        <div style={{ fontSize: "14px", height: '68px' }}>{room.description}</div>
-                                                        {/* Room number */}
-
-                                                        {/* Room type */}
-                                                        <div style={{ fontSize: "16px" }}>{room.roomType}</div>
-                                                    </div>
-
-                                                </div>
-                                            </td>
-                                            <td style={{
-                                                border: "1px solid gray",
-                                                maxWidth: "150px",
-                                                minWidth: "100px",
-
-                                            }}>
-                                                <div style={{ display: 'inline-block', marginLeft: '4px' }}>
-                                                    <div style={{ fontWeight: 'bold' }}>{room.price} VND</div>
-                                                    <div style={{ fontSize: '12px' }}>Taxes and fees included</div>
-                                                </div>
-                                            </td>
-                                            <td style={{ border: "1px solid gray", maxWidth: "280px" }}>
-                                                <div style={{ fontSize: '12px' }}>
-                                                    <ul>
-                                                        <li>Includes a great breakfast</li>
-                                                        <li>No credit card required</li>
-                                                        <li>No prepayment required – pay at the property</li>
-                                                    </ul>
-
-                                                </div>
-                                            </td>
-                                            <td style={{ border: "1px solid gray", width: '150px', maxWidth: "160px" }}>
-                                                <div>
-                                                    <Button style={{
-                                                        height: "40px",
-                                                        width: '100px',
-                                                        borderRadius: '5px',
-                                                        fontSize: '14px',
-                                                        marginLeft: '25px'
-                                                    }}
-                                                        type="button"
-                                                        onClick={() => handleShow(room)}>
-                                                        I will book
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <div colSpan="4" style={{ padding: "10px", color: "#666" }}>
-                                        No rooms available for booking
-                                    </div>
-                                )}
-
-                            </tbody>
-
-                            {/* Modal to display the confirmation dialog */}
-                            <Modal sz='lg' backdrop="static" show={show} onHide={handleClose} centered>
-                                <Modal.Header closeButton style={{ padding: '12px' }}>
-                                    <Modal.Title>Confirm Booking</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <p><strong>Customer Name:</strong> {name}</p>
-                                    <p><strong>Email:</strong> {email}</p>
-                                    <p><strong>Hotel Name:</strong> {hotel.name}</p>
-                                    <p><strong>Room Number:</strong> {selectedRoom?.number}</p> 
-                                    <p><strong>Address:</strong> {hotel.address}</p>
-                                    <Form.Group controlId="checkinDate">
-                                        <Form.Label>Check-in Date</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            value={checkinDate}
-                                            onChange={(e) => setCheckinDate(e.target.value)}
-                                            required
+                                    {/* Hình lớn */}
+                                    <div style={{ gridColumn: "1 / span 2" }}>
+                                        <img
+                                            src={hotel.paths[0]}
+                                            alt={hotel.name || "Hotel"}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                                borderRadius: "8px",
+                                            }}
                                         />
-                                    </Form.Group>
-                                    <Form.Group controlId="checkoutDate" style={{ marginTop: '10px' }}>
-                                        <Form.Label>Check-out Date</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            value={checkoutDate}
-                                            onChange={(e) => setCheckoutDate(e.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
-                                    <div style={{ flex: 1, textAlign: 'left' }}>
-                                        {(!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0) && (
-                                            <p style={{ color: 'red', fontSize: '14px', marginTop: '8px' }}>
-                                                Please select Check-in and Check-out dates.
-                                            </p>
-                                        )}
                                     </div>
-                                    <p><strong>Number of nights:</strong> {calculateNights(checkinDate, checkoutDate)} nights</p>
-                                    <p><strong>Price per night:</strong> {selectedRoom?.price} VND</p>
-                                    <p><strong>Total Price:</strong> {calculateNights(checkinDate, checkoutDate) * selectedRoom?.price} VND</p>
-                                    </Modal.Body>   
-                                    <Modal.Footer>
-                                        <Button
-                                            variant="primary"
-                                            onClick={handleConfirmBooking}
-                                            disabled={!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0}
-                                        >
-                                            Confirm
-                                        </Button>
-                                        <Button variant="secondary" onClick={handleClose}>
-                                            Cancel
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-                        </table>
 
-                    </div>
-                </div>
-
-
-                {/* Các tiện nghi */}
-                <div style={{ lineHeight: '1.6', marginTop: '20px' }} id='facility'>
-                    <h5 style={{ fontSize: '1.5em', paddingBottom: '6px' }}>
-                        Facilities of the hotel
-                    </h5>
-
-                    <div>
-                        <h6 style={{
-                            fontSize: '1.2em',
-                            marginTop: '10px',
-                            marginBottom: '12px',
-                        }}>General Facilities</h6>
-                        <div style={{
-                            listStyle: 'none',
-                            padding: '10px 2px',
-                            margin: '0',
-                            backgroundColor: '#f5f5f5'
-                        }}>
-                            <div style={{
-                                display: 'flex',
-                                width: '100%',
-                                justifyContent: 'space-between'
-                            }}>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Airport shuttle
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Non-smoking rooms
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Free parking
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Free WiFi
+                                    {/* Hình nhỏ hơn */}
+                                    {hotel.paths.slice(1, 5).map((path, index) => (
+                                        <img
+                                            key={index}
+                                            src={path}
+                                            alt={`Image ${index + 1}`}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                                borderRadius: "8px",
+                                            }}
+                                        />
+                                    ))}
                                 </div>
                             </div>
+                            <div></div>
+                        </div>
+
+                        {/* Phần mô tả */}
+                        <div id='description'>
+                            <h5 style={{ marginBottom: '16px' }}>Description</h5>
+                            <div style={{ display: 'flex', width: "100%" }}>
+                                <div style={{ width: '80%' }}>
+                                    <p style={{ marginRight: '30px', minHeight: '116px', backgroundColor: '#f5f5f5' }}>
+                                        {hotel.description || "Không có thông tin mô tả."}
+                                    </p>
+                                </div>
+                                <div style={{ width: '20%' }}>
+                                    <div style={{ gap: '1rem', marginLeft: '5px', height: '115px', backgroundColor: '#f0f6ff' }}>
+                                        <div style={{ flex: 1 }} >
+                                            <div style={{ fontWeight: '500', marginLeft: '10px' }}>Check-in:</div>
+                                            <div style={{ marginLeft: '25px' }}>{hotel.checkin || "Từ 12:00 đến 14:00"}</div>
+                                        </div>
+                                        <div style={{ flex: 1 }} >
+                                            <div style={{ fontWeight: '500', marginLeft: '10px' }}>Check-out:</div>
+                                            <div style={{ marginLeft: '25px' }}>{hotel.checkout || "Trước 12:00"}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id='popular'>
+                            <h5 style={{ marginBottom: '16px' }}>Most popular facilities</h5>
                             <div style={{
                                 display: 'flex',
-                                width: '100%',
+                                alignItems: 'center',
                                 justifyContent: 'space-between',
-                                marginTop: '15px'
+                                width: "100%",
+                                padding: "14px 5px",
+                                backgroundColor: '#f5f5f5'
                             }}>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> 24-hour front desk
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Terrace
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Laundry
-                                </div>
-                                <div style={liStyle1}>
-                                    <FaCheck style={iconStyle} /> Room service
-                                </div>
+                                {facilities.map((facility, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                color: facility.isAvailable ? 'green' : 'red',
+                                                marginRight: '8px',
+                                                fontSize: '18px',
+                                            }}
+                                        >
+                                            {facility.isAvailable ? <FaCheck style={{ marginBottom: '5px' }} /> : ''}
+                                        </span>
+                                        <span>{facility.name}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    </div>
 
-                    <div style={{
-                        lineHeight: '1.6',
-                        width: '100%',
-                        display: 'flex'
-                    }}>
-                        {/* Bathroom */}
-                        <div style={{ width: '33.33%' }} >
-                            <h6 style={{
-                                fontSize: '1.2em',
-                                marginTop: '20px',
-                                marginBottom: '12px',
-                            }}>
-                                Bathroom
-                            </h6>
-                            <ul style={{
-                                listStyle: 'none',
-                                padding: '0',
-                                margin: '0',
-                                flexWrap: 'wrap',
-                            }}>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Toilet paper
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Towels
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Additional bathroom
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Bidet
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Additional toilet
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Slippers
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Toilet
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Free toiletries
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Hairdryer
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Shower
-                                </li>
-                            </ul>
+                        <hr style={{ marginTop: '30px' }}></hr>
+                        {/* Phần hiển thị room*/}
+                        <div id='room'>
+                            <h5 style={{ marginBottom: '16px' }}>Availability</h5>
+                            <div style={{ display: 'flex', width: "100%" }}>
+                                <table style={{ width: "960px", borderCollapse: "collapse" }}>
+                                    <thead style={{ backgroundColor: "#003366", color: "white", border: "1px solid #ccc" }}>
+                                        <tr>
+                                            <th style={{ border: "1px solid #ccc" }}>Accommodation Type</th>
+                                            <th style={{ border: "1px solid #ccc", textAlign: 'center' }}>Today's price</th>
+                                            <th style={{ border: "1px solid #ccc", textAlign: 'center' }}>Your choices</th>
+                                            <th style={{ border: "1px solid #ccc", textAlign: 'center' }}>Book</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {lstRoom && lstRoom.length > 0 ? (
+                                            lstRoom.map((room, index) => (
+                                                <tr
+                                                    key={room.id}
+                                                >
+                                                    <td style={{ border: "1px solid gray", maxWidth: '400px' }}>
+                                                        <div style={{ display: 'flex', width: '380px' }}>
+                                                            {/* Image */}
+                                                            <div style={{ width: '40%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                <img
+                                                                    src={room.imagePaths[0]}
+                                                                    alt={`Room ${room.number}`}
+                                                                    style={{ width: "100%", height: "120px", objectFit: "cover", padding: "4px" }}
+                                                                />
+                                                            </div>
+                                                            <div style={{ width: '60%' }}>
+                                                                <div style={{ fontSize: "18px", color: '#003366', fontWeight: '700' }}>{`Number room: ${room.number}`}</div>
+                                                                <div style={{ fontSize: "14px", height: '68px' }}>{room.description}</div>
+                                                                {/* Room number */}
+
+                                                                {/* Room type */}
+                                                                <div style={{ fontSize: "16px" }}>{room.roomType}</div>
+                                                            </div>
+
+                                                        </div>
+                                                    </td>
+                                                    <td style={{
+                                                        border: "1px solid gray",
+                                                        maxWidth: "150px",
+                                                        minWidth: "100px",
+
+                                                    }}>
+                                                        <div style={{ display: 'inline-block', marginLeft: '4px' }}>
+                                                            <div style={{ fontWeight: 'bold' }}>{room.price} VND</div>
+                                                            <div style={{ fontSize: '12px' }}>Taxes and fees included</div>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ border: "1px solid gray", maxWidth: "280px" }}>
+                                                        <div style={{ fontSize: '12px' }}>
+                                                            <ul>
+                                                                <li>Includes a great breakfast</li>
+                                                                <li>No credit card required</li>
+                                                                <li>No prepayment required – pay at the property</li>
+                                                            </ul>
+
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ border: "1px solid gray", width: '150px', maxWidth: "160px" }}>
+                                                        <div>
+                                                            <Button style={{
+                                                                height: "40px",
+                                                                width: '100px',
+                                                                borderRadius: '5px',
+                                                                fontSize: '14px',
+                                                                marginLeft: '25px'
+                                                            }}
+                                                                type="button"
+                                                                onClick={() => handleShow(room)}>
+                                                                I will book
+                                                            </Button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <div colSpan="4" style={{ padding: "10px", color: "#666" }}>
+                                                No rooms available for booking
+                                            </div>
+                                        )}
+
+                                    </tbody>
+
+                                    {/* Modal to display the confirmation dialog */}
+                                    <Modal sz='lg' backdrop="static" show={show} onHide={handleClose} centered>
+                                        <Modal.Header closeButton style={{ padding: '12px' }}>
+                                            <Modal.Title>Confirm Booking</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body style={{ padding: '16px 20px 0' }}>
+                                            {errorBook && <p className="alert alert-danger profile-alert">{errorBook}</p>}
+                                            <p>Customer's name: <strong>{name}</strong></p>
+                                            <p>Email: <strong>{email}</strong></p>
+                                            <p>Hotel name: {hotel.name}</p>
+                                            <p>Room Number: {selectedRoom?.number}</p>
+                                            <p>Address: {hotel.address}</p>
+                                            <Form.Group controlId="checkinDate">
+                                                <Form.Label>Check-in Date</Form.Label>
+                                                <Form.Control
+                                                    type="date"
+                                                    value={checkinDate}
+                                                    onChange={(e) => setCheckinDate(e.target.value)}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                            <Form.Group controlId="checkoutDate" style={{ marginTop: '10px' }}>
+                                                <Form.Label>Check-out Date</Form.Label>
+                                                <Form.Control
+                                                    type="date"
+                                                    value={checkoutDate}
+                                                    onChange={(e) => setCheckoutDate(e.target.value)}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                            <div style={{ flex: 1, textAlign: 'left' }}>
+                                                {(!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0) && (
+                                                    <p style={{ color: 'red', fontSize: '14px', marginTop: '8px' }}>
+                                                        Please select Check-in and Check-out dates.
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <p>Price per night: <strong>{selectedRoom?.price} VND</strong></p>
+                                            <p>Number of nights:
+                                                {checkinDate && checkoutDate && calculateNights(checkinDate, checkoutDate) > 0
+                                                    ? ` ${calculateNights(checkinDate, checkoutDate)} nights`
+                                                    : ''
+                                                }
+                                            </p>
+                                            <p><strong>Total Price:
+                                                {checkinDate && checkoutDate && calculateNights(checkinDate, checkoutDate) > 0
+                                                    ? ` ${calculateNights(checkinDate, checkoutDate) * selectedRoom?.price} VND`
+                                                    : ''}
+                                            </strong></p>
+                                        </Modal.Body>
+                                        <Modal.Footer style={{ padding: '1px' }}>
+                                            <Button
+                                                variant="primary"
+                                                onClick={handleConfirmBooking}
+                                                disabled={!checkinDate || !checkoutDate || calculateNights(checkinDate, checkoutDate) <= 0}
+                                            >
+                                                Confirm
+                                            </Button>
+                                            <Button variant="secondary" onClick={handleClose}>
+                                                Cancel
+                                            </Button>
+                                        </Modal.Footer>
+                                    </Modal>
+
+                                    <Modal centered size="sm" show={showSuccessDialog} backdrop="static" onHide={handleSuccessDialogClose}>
+                                        <Modal.Header style={{ height: '50px', color: 'white', backgroundColor: '#28a745' }}>
+                                            <Modal.Title className="user-info">
+                                                <IoCheckmarkCircle style={{ marginRight: '10px' }} />
+                                                Success
+                                            </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <h6 style={{ marginTop: '8px' }}>Room booked successfully.</h6>
+                                        </Modal.Body>
+                                        <Modal.Footer style={{ padding: '0px', backgroundColor: '#EEEEEE' }}>
+                                            <div className="btn-center" style={{ padding: '1px 0px', backgroundColor: '#f5f5f6' }}>
+                                                <button
+                                                    onClick={handleSuccessDialogClose}
+                                                    style={{
+                                                        backgroundColor: "#28a745",
+                                                        color: "white",
+                                                        padding: "3px 13px",
+                                                        borderRadius: "5px",
+                                                        border: '0px',
+                                                        cursor: "pointer",
+                                                    }}
+                                                >
+                                                    OK
+                                                </button>
+                                            </div>
+                                        </Modal.Footer>
+                                    </Modal>
+                                </table>
+
+                            </div>
                         </div>
 
-                        <div style={{ width: '33.33%' }}>
-                            {/* Bedroom */}
-                            <div style={{ marginLeft: '70px' }}>
+
+                        {/* Các tiện nghi */}
+                        <div style={{ lineHeight: '1.6', marginTop: '20px' }} id='facility'>
+                            <h5 style={{ fontSize: '1.5em', paddingBottom: '6px' }}>
+                                Facilities of the hotel
+                            </h5>
+
+                            <div>
                                 <h6 style={{
                                     fontSize: '1.2em',
-                                    marginTop: '20px',
+                                    marginTop: '10px',
                                     marginBottom: '12px',
-                                }}>
-                                    Bedroom
-                                </h6>
-                                <ul style={{
+                                }}>General Facilities</h6>
+                                <div style={{
                                     listStyle: 'none',
-                                    padding: '0',
+                                    padding: '10px 2px',
                                     margin: '0',
-                                    flexWrap: 'wrap',
+                                    backgroundColor: '#f5f5f5'
                                 }}>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Wardrobe or closet
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Bed
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Nightstand
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Desk
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Lamp
-                                    </li>
-                                </ul>
+                                    <div style={{
+                                        display: 'flex',
+                                        width: '100%',
+                                        justifyContent: 'space-between'
+                                    }}>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Airport shuttle
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Non-smoking rooms
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Free parking
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Free WiFi
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        width: '100%',
+                                        justifyContent: 'space-between',
+                                        marginTop: '15px'
+                                    }}>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> 24-hour front desk
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Terrace
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Laundry
+                                        </div>
+                                        <div style={liStyle1}>
+                                            <FaCheck style={iconStyle} /> Room service
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Outdoors */}
                             <div style={{
-                                marginLeft: '70px',
+                                lineHeight: '1.6',
+                                width: '100%',
+                                display: 'flex'
                             }}>
-                                <h6 style={{
-                                    fontSize: '1.2em',
-                                    marginTop: '20px',
-                                    marginBottom: '12px',
-                                }}>
-                                    Outdoors
-                                </h6>
-                                <ul style={{
-                                    listStyle: 'none',
-                                    padding: '0',
-                                    margin: '0',
-                                    flexWrap: 'wrap',
-                                }}>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Outdoor furniture
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Outdoor dining area
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Terrace
-                                    </li>
-                                    <li style={listItemStyle}>
-                                        <FaCheck style={checkIconStyle} /> Garden
-                                    </li>
-                                </ul>
+                                {/* Bathroom */}
+                                <div style={{ width: '33.33%' }} >
+                                    <h6 style={{
+                                        fontSize: '1.2em',
+                                        marginTop: '20px',
+                                        marginBottom: '12px',
+                                    }}>
+                                        Bathroom
+                                    </h6>
+                                    <ul style={{
+                                        listStyle: 'none',
+                                        padding: '0',
+                                        margin: '0',
+                                        flexWrap: 'wrap',
+                                    }}>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Toilet paper
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Towels
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Additional bathroom
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Bidet
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Additional toilet
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Slippers
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Toilet
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Free toiletries
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Hairdryer
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Shower
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div style={{ width: '33.33%' }}>
+                                    {/* Bedroom */}
+                                    <div style={{ marginLeft: '70px' }}>
+                                        <h6 style={{
+                                            fontSize: '1.2em',
+                                            marginTop: '20px',
+                                            marginBottom: '12px',
+                                        }}>
+                                            Bedroom
+                                        </h6>
+                                        <ul style={{
+                                            listStyle: 'none',
+                                            padding: '0',
+                                            margin: '0',
+                                            flexWrap: 'wrap',
+                                        }}>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Wardrobe or closet
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Bed
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Nightstand
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Desk
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Lamp
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    {/* Outdoors */}
+                                    <div style={{
+                                        marginLeft: '70px',
+                                    }}>
+                                        <h6 style={{
+                                            fontSize: '1.2em',
+                                            marginTop: '20px',
+                                            marginBottom: '12px',
+                                        }}>
+                                            Outdoors
+                                        </h6>
+                                        <ul style={{
+                                            listStyle: 'none',
+                                            padding: '0',
+                                            margin: '0',
+                                            flexWrap: 'wrap',
+                                        }}>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Outdoor furniture
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Outdoor dining area
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Terrace
+                                            </li>
+                                            <li style={listItemStyle}>
+                                                <FaCheck style={checkIconStyle} /> Garden
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+
+                                {/* Kitchen */}
+                                <div style={{ width: '33.33%' }}>
+                                    <h6 style={{
+                                        fontSize: '1.2em',
+                                        marginTop: '20px',
+                                        marginBottom: '12px',
+                                        marginLeft: '145px',
+                                    }}>
+                                        Kitchen
+                                    </h6>
+                                    <ul style={{
+                                        listStyle: 'none',
+                                        padding: '0',
+                                        margin: '0',
+                                        marginLeft: '145px',
+                                    }}>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Shared kitchen
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Stovetop
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Clothes dryer
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Kettle
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Washing machine
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Oven
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Refrigerator
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Microwave
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Coffee machine
+                                        </li>
+                                        <li style={listItemStyle}>
+                                            <FaCheck style={checkIconStyle} /> Toaster
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        {/* Quy tắc chung */}
+                        <div id='rule'>
+                            <h5 style={{ marginBottom: '14px' }}>House rules</h5>
+                            <p>Get special requests - add in the next step!</p>
+                            <div style={outerContainerStyle}>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <GoSignIn style={IconStyle} />Nhận phòng
+                                    </h6>
+                                    <p style={pStyle}>Từ 12:00 - 23:00</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <GoSignOut style={IconStyle} />Trả phòng
+                                    </h6>
+                                    <p style={pStyle}>Từ 08:00 - 12:00</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <BsInfoCircle style={IconStyle} />Hủy đặt phòng/ Trả trước
+                                    </h6>
+                                    <p style={pStyle}>Các chính sách hủy và thanh toán trước sẽ khác nhau tùy vào từng chỗ nghỉ. Vui lòng kiểm tra các điều khoản được áp dụng cho mỗi lựa chọn của bạn.</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <MdFamilyRestroom style={IconStyle} />Trẻ em và giường
+                                    </h6>
+                                    <div style={pContainerStyle}>
+                                        <p style={pStyle}> <strong>Chính sách cho trẻ em.</strong> </p>
+                                        <p style={pStyle}>Để xem thông tin giá và tình trạng phòng chính xác, vui lòng thêm tuổi và số lượng trẻ em trong nhóm của bạn khi tìm kiếm.</p>
+                                        <p style={pStyle}> Chính sách nôi (cũi) và giường phụ </p>
+                                        <p style={pStyle}>Chỗ nghỉ này không cung cấp nôi/cũi và giường phụ.</p>
+                                    </div>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <IoManOutline style={IconStyle} />Không giới hạn độ tuổi
+                                    </h6>
+                                    <p style={pStyle}>Không có yêu cầu về độ tuổi khi nhận phòng.</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <MdOutlinePets style={IconStyle} />Vật nuôi
+                                    </h6>
+                                    <p style={pStyle}>Vật nuôi không được phép.</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <CiCreditCard1 style={IconStyle} />Chỉ thanh toán bằng tiền mặt
+                                    </h6>
+                                    <p style={pStyle}>Chỗ nghỉ này chỉ chấp nhận thanh toán bằng tiền mặt.</p>
+                                </div>
+                                <div style={dividerStyle}></div>
+
+                                <div style={containerStyle}>
+                                    <h6 style={h6Style}>
+                                        <LuPartyPopper style={IconStyle} />Tiệc tùng
+                                    </h6>
+                                    <p style={pStyle}>Không cho phép tổ chức tiệc tùng/sự kiện.</p>
+                                </div>
                             </div>
                         </div>
-
-
-                        {/* Kitchen */}
-                        <div style={{ width: '33.33%' }}>
-                            <h6 style={{
-                                fontSize: '1.2em',
-                                marginTop: '20px',
-                                marginBottom: '12px',
-                                marginLeft: '145px',
-                            }}>
-                                Kitchen
-                            </h6>
-                            <ul style={{
-                                listStyle: 'none',
-                                padding: '0',
-                                margin: '0',
-                                marginLeft: '145px',
-                            }}>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Shared kitchen
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Stovetop
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Clothes dryer
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Kettle
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Washing machine
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Oven
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Refrigerator
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Microwave
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Coffee machine
-                                </li>
-                                <li style={listItemStyle}>
-                                    <FaCheck style={checkIconStyle} /> Toaster
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                {/* Quy tắc chung */}
-                <div id='rule'>
-                    <h5 style={{ marginBottom: '14px' }}>House rules</h5>
-                    <p>Get special requests - add in the next step!</p>
-                    <div style={outerContainerStyle}>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <GoSignIn style={IconStyle} />Nhận phòng
-                            </h6>
-                            <p style={pStyle}>Từ 12:00 - 23:00</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <GoSignOut style={IconStyle} />Trả phòng
-                            </h6>
-                            <p style={pStyle}>Từ 08:00 - 12:00</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <BsInfoCircle style={IconStyle} />Hủy đặt phòng/ Trả trước
-                            </h6>
-                            <p style={pStyle}>Các chính sách hủy và thanh toán trước sẽ khác nhau tùy vào từng chỗ nghỉ. Vui lòng kiểm tra các điều khoản được áp dụng cho mỗi lựa chọn của bạn.</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <MdFamilyRestroom style={IconStyle} />Trẻ em và giường
-                            </h6>
-                            <div style={pContainerStyle}>
-                                <p style={pStyle}> <strong>Chính sách cho trẻ em.</strong> </p>
-                                <p style={pStyle}>Để xem thông tin giá và tình trạng phòng chính xác, vui lòng thêm tuổi và số lượng trẻ em trong nhóm của bạn khi tìm kiếm.</p>
-                                <p style={pStyle}> Chính sách nôi (cũi) và giường phụ </p>
-                                <p style={pStyle}>Chỗ nghỉ này không cung cấp nôi/cũi và giường phụ.</p>
-                            </div>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <IoManOutline style={IconStyle} />Không giới hạn độ tuổi
-                            </h6>
-                            <p style={pStyle}>Không có yêu cầu về độ tuổi khi nhận phòng.</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <MdOutlinePets style={IconStyle} />Vật nuôi
-                            </h6>
-                            <p style={pStyle}>Vật nuôi không được phép.</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <CiCreditCard1 style={IconStyle} />Chỉ thanh toán bằng tiền mặt
-                            </h6>
-                            <p style={pStyle}>Chỗ nghỉ này chỉ chấp nhận thanh toán bằng tiền mặt.</p>
-                        </div>
-                        <div style={dividerStyle}></div>
-
-                        <div style={containerStyle}>
-                            <h6 style={h6Style}>
-                                <LuPartyPopper style={IconStyle} />Tiệc tùng
-                            </h6>
-                            <p style={pStyle}>Không cho phép tổ chức tiệc tùng/sự kiện.</p>
-                        </div>
+                        <h5 style={{ marginBottom: '16px' }}>Recent attractions</h5>
+                        <section>
+                            <RecentHotel hotel={hotel} />
+                        </section>
                     </div>
                 </div>
-                <h5 style={{ marginBottom: '16px' }}>Recent attractions</h5>
-                <section>
-                    <RecentHotel />
-                </section>
-            </div>
+            ) : (
+                // Hiển thị thông báo nếu không có thông tin khách sạn
+                <div>
+                    <p>No hotel information available. Please try again later.</p>
+                </div>
+            )}
         </div>
     );
 };

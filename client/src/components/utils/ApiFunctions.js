@@ -281,3 +281,35 @@ export const getDestinations = async (params) => {
         console.log('Error fetching destinations:', error);
     }
 };
+
+export const bookRoom = async (param) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api.post("/api/booked-rooms/book", param, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const bookHistory = async (email) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api.get(`/api/booked-rooms/history/${email}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};

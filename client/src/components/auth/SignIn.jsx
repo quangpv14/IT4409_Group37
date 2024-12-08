@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { signIn, signInAdmin } from '../utils/ApiFunctions';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthProvider';
@@ -51,6 +51,10 @@ export const SignIn = () => {
             setErrorMessage("");
         }, 4000)
     }
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <section className='section-sign-in'>

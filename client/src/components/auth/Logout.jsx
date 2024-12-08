@@ -39,6 +39,14 @@ export const Logout = () => {
       <li>
         <hr className="dropdown-divider" />
       </li>
+      <li>
+        <Link className="dropdown-item" to={"/manager/history"}>
+          Booking history
+        </Link>
+      </li>
+      <li>
+        <hr className="dropdown-divider" />
+      </li>
       <button className="dropdown-item" onClick={handleLogout}>
         Logout
       </button>
