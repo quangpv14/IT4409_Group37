@@ -5,6 +5,7 @@ import DashSidebar from './DashSidebar';
 import DashHotelManagement from './DashHotelManagement';
 import DashRoomManagement from './DashRoomManagement';
 import DashboardComp from './DashboardComp';
+import BookingManagement from './BookingManagement';
 
 export const Dashboard = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ export const Dashboard = () => {
     }
   }, [location.search]);
 
-  const validTabs = ['dashboard', 'hotel-management', 'room-management'];
+  const validTabs = ['dashboard', 'hotel-management', 'room-management', 'book-management'];
   const currentTab = validTabs.includes(tab) ? tab : 'dashboard';
 
   return (
@@ -34,6 +35,7 @@ export const Dashboard = () => {
           {currentTab === 'dashboard' && <DashboardComp />}
           {currentTab === 'hotel-management' && <DashHotelManagement />}
           {currentTab === 'room-management' && <DashRoomManagement />}
+          {currentTab === 'book-management' && <BookingManagement />}
         </Col>
       </Row>
     </Container>   

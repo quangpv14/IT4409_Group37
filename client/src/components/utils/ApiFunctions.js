@@ -292,6 +292,54 @@ export const findHotels = async (params) => {
     }
 };
 
+export const fectchBooking = async (params) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.get(`/api/admin/booking/booked-rooms`, { params }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response;
+    } catch (error) {
+        console.log('Failed to fetch bookings.Please try again.', error);
+        throw error;
+    }
+};
+
+export const fectchAllBooking = async (params) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.get(`/api/admin/booking/order/findall`, { params }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response;
+    } catch (error) {
+        console.log('Failed to fetch bookings.Please try again.', error);
+        throw error;
+    }
+};
+
+export const fectchTotalAmount = async (params) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await api_admin.get(`/api/admin/booking/total`, { params }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response;
+    } catch (error) {
+        console.log('Failed to fetch data.Please try again.', error);
+        throw error;
+    }
+};
+
 export const getDestinations = async (params) => {
     try {
         const response = await api.get('api/hotel/destination', { params });

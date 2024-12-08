@@ -5,6 +5,8 @@ import { FaTachometerAlt, FaHotel, FaBed } from 'react-icons/fa';
 import { AiOutlinePieChart } from "react-icons/ai";
 import { FaUserCircle } from "react-icons/fa";
 import { CgLogOut } from "react-icons/cg";
+import { FaListAlt } from "react-icons/fa";
+
 
 import { AuthContext } from '../auth/AuthProvider';
 import { useSelector, useDispatch } from 'react-redux';
@@ -51,6 +53,13 @@ const DashSidebar = () => {
                         <Link to="?tab=room-management" className="nav-link nav-comp" style={{ width: '100%' }}>
                             <FaBed style={{ marginRight: '10px' }} />
                             Room Management
+                        </Link>
+                    </Nav.Item>
+                    <hr style={{ margin: '0px' }}></hr>
+                    <Nav.Item className='nav-comp'>
+                        <Link to="?tab=book-management" className="nav-link nav-comp" style={{ width: '100%' }}>
+                            <FaListAlt style={{ marginRight: '10px' }} />
+                            Booking Management
                         </Link>
                     </Nav.Item>
                     <hr style={{ margin: '0px' }}></hr>
