@@ -8,6 +8,7 @@ import { Modal, Button, Form, ModalFooter } from 'react-bootstrap';
 import { app, storage } from '../../firebaseConfig';
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { createHotel, updateHotel, getHotelsByAdmin } from "../utils/ApiFunctions";
+import { Link } from "react-router-dom";
 
 const DashHotelManagement = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -244,7 +245,11 @@ const DashHotelManagement = () => {
                 }}
               >
                 <td style={{ border: "1px solid gray", textAlign: "center" }}>{index + 1}</td>
-                <td style={{ maxWidth: "220px" }} className="ellipse-text">{hotel.name}</td>
+                <td style={{ maxWidth: "220px" }} className="ellipse-text">
+                  <Link to={`/hotel/${hotel.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {hotel.name}
+                  </Link>
+                </td>  
                 <td style={{ maxWidth: "350px" }} className="ellipse-text">{hotel.address}</td>
                 <td
                   style={{ maxWidth: "260px" }} className="ellipse-text"
