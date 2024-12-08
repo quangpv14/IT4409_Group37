@@ -1,11 +1,24 @@
 import React from 'react';
-import { Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaHotel, FaBed } from 'react-icons/fa';
+import { Nav, Button } from 'react-bootstrap';
+import { FaTachometerAlt, FaHotel, FaBed, FaUserCircle } from 'react-icons/fa';
 import { AiOutlinePieChart } from "react-icons/ai";
+import { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { clearUser } from '../../store/userSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { AuthContext } from '../auth/AuthProvider';
 
+const DashSidebar = () => {  
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-const DashSidebar = () => {
+    const handleLogOut = () => {
+        auth.handleLogout();
+        dispatch(clearUser());
+        navigate("/login", { state: { message: "You have been logged out!" } })
+        window.location.reload();
+    }
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '65px', backgroundColor: '#cecece' }}>
@@ -34,6 +47,25 @@ const DashSidebar = () => {
                     </Link>
                 </Nav.Item>
             </Nav>
+
+            {/* Logout button */}
+            <div className="p-3" style={{ position: 'relative' }}>
+                <Button
+                    variant="danger"
+                    onClick={handleLogOut}
+                    style={{
+                        width: '80%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '15px', /* Tăng khoảng cách */
+                        marginTop: '550px'
+                    }}
+                >
+                    <FaUserCircle />
+                    Log Out
+                </Button>
+            </div>
         </div>
     );
 };
