@@ -332,9 +332,14 @@ h2 {
 
 .user-info,
 .cb-sign-in,
-.search-area {
+.search-area,
+.nav-comp {
   display: flex;
   align-items: center;
+}
+
+.nav-comp {
+  height: 50px;
 }
 
 .user-label {
@@ -495,4 +500,11 @@ h2 {
   background-color: #007bff;
   color: white;
   font-weight: bold;
+}
+
+.info-admin {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height: 9%;
 }

@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { bookHistory } from '../utils/ApiFunctions';
 import { useSelector } from 'react-redux';
 const BookingHistory = () => {
+
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const { email } = useSelector((state) => state.user);
-
+    const email = localStorage.getItem("email");
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchBookingHistory = async () => {
@@ -24,11 +23,9 @@ const BookingHistory = () => {
             }
         };
 
-        if (email) {
-            fetchBookingHistory();
-        } else {
-            setError('Please log in to view booking history.');
-        }
+
+        fetchBookingHistory(email);
+
     }, [email]);
 
     return (

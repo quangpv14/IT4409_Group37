@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { updateUser, getUser } from "../utils/ApiFunctions";
+import { updateUser, getUser, getAdminProfile, updateAdmin } from "../utils/ApiFunctions";
 import { useSelector, useDispatch } from 'react-redux';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
     const { name, isAuthenticated, isAdmin } = useSelector((state) => state.user);
@@ -13,12 +14,22 @@ const Profile = () => {
     const token = localStorage.getItem("token");
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchUser = async () => {
+            setLoading(true);
             try {
-                const userData = await getUser(email, token);
-                setUser(userData);
+                if (!isAdmin) {
+                    const userData = await getUser(email, token);
+                    setUser(userData);
+                }
+                else {
+                    const adminData = await getAdminProfile(email);
+                    setUser(adminData);
+                }
             } catch (error) {
                 console.error(error);
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -29,20 +40,6 @@ const Profile = () => {
         const confirmed = window.confirm(
             "Are you sure you want to delete your account?"
         )
-        // if (confirmed) {
-        //     await deleteUser(userId)
-        //         .then((response) => {
-        //             setMessage(response.data)
-        //             localStorage.removeItem("token");
-        //             localStorage.removeItem("userId");
-        //             localStorage.removeItem("userRole");
-        //             navigate("/");
-        //             window.location.reload();
-        //         })
-        //         .catch((error) => {
-        //             setErrorMessage(error.data);
-        //         })
-        // }
     }
 
     const handleUpdateAccount = async () => {
@@ -56,18 +53,40 @@ const Profile = () => {
         }
 
         try {
-            const response = await updateUser(updatedUser, token);
-            setMessage("Account updated successfully!");
+            if (!isAdmin) {
+                setLoading(true);
+                const response = await updateUser(updatedUser, token);
 
-            try {
-                const userData = await getUser(email, token);
-                setUser(userData);
-            } catch (error) {
-                console.error(error);
+                try {
+                    const userData = await getUser(email, token);
+                    setMessage("Account updated successfully!");
+                    setUser(userData);
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(true);
+                const response = await updateAdmin(updatedUser, token);
+
+
+                try {
+                    const data = await getAdminProfile(email);
+                    setMessage("Account updated successfully!");
+                    setUser(data);
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setLoading(false);
+                }
             }
+
 
         } catch (error) {
             setErrorMessage('An error occurred. Please try again!');
+        } finally {
+            setLoading(false);
         }
 
         setTimeout(() => {
@@ -80,9 +99,10 @@ const Profile = () => {
         <div className="container" style={{ height: '90vh' }}>
             {errorMessage && <p className="alert alert-danger profile-alert">{errorMessage}</p>}
             {message && <p className="alert alert-success profile-alert">{message}</p>}
+            {loading && <div className="loading-overlay">Loading...</div>}
             {user ? (
                 <div className="card p-5 mt-5" style={{ backgroundColor: "whitesmoke" }}>
-                    <h4 className="card-title text-center">User Information</h4>
+                    <h4 className="card-title text-center">Profile Information</h4>
                     <div className="card-body">
                         <div className="col-md-10 mx-auto">
                             <div className="card mb-3 shadow">

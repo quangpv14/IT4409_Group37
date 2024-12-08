@@ -61,7 +61,7 @@ const HotelDetails = ({ onSubmit }) => {
     const handleSuccessDialogClose = async () => {
         setShowSuccessDialog(false);
         setShow(false);
-        navigate("manager/history")
+        navigate("/manager/history");
 
     }
     const handleConfirmBooking = async () => {
