@@ -83,15 +83,20 @@ export async function signInAdmin(login) {
     }
 }
 
-/** This function get User Profile */
-export async function getUserProfile(userId, token) {
+/** This function get Profile */
+export async function getAdminProfile(email) {
+    const token = localStorage.getItem("token");
     try {
-        const response = await api.get(`/api/users/profile/${userId}`, {
-            headers: getHearder()
+        const response = await api_admin.get(`/admin/profile/${email}`, {
+            headers:
+            {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
         })
-        return response.data
+        return response.data;
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
@@ -103,6 +108,20 @@ export async function getUser(email, token) {
                 'Authorization': `Bearer ${token}`
             }
         })
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function updateAdmin(data, token) {
+    try {
+        const response = await api_admin.put(`/admin/update`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         return response.data;
     } catch (error) {
         console.log(error);

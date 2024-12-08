@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { bookHistory } from '../utils/ApiFunctions';
 import { useSelector } from 'react-redux';
 const BookingHistory = () => {
+
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    const { email } = useSelector((state) => state.user);
-
+    const email = localStorage.getItem("email");
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchBookingHistory = async () => {
@@ -24,15 +23,54 @@ const BookingHistory = () => {
             }
         };
 
-        if (email) {
-            fetchBookingHistory();
-        } else {
-            setError('Please log in to view booking history.');
-        }
+
+        fetchBookingHistory(email);
+
     }, [email]);
 
     return (
         <div style={{ height: '100vh' }}>
+
+            <style>
+                {`
+                    .booking-history-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                        font-size: 16px;
+                        text-align: left;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
+                    .booking-history-table th,
+                    .booking-history-table td {
+                        border: 1px solid #ddd;
+                        padding: 12px;
+                    }
+                    .booking-history-table th {
+                        background-color: #f4f4f4;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                    }
+                    .booking-history-table tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                    .booking-history-table tr:hover {
+                        background-color: #f1f1f1;
+                    }
+                    .loading-overlay {
+                        text-align: center;
+                        margin: 20px 0;
+                    }
+                    .alert {
+                        color: red;
+                        text-align: center;
+                    }
+                    .no-history {
+                        color: gray;
+                    }
+                `}
+            </style>
+
             <h1 style={{ marginTop: '30px', textAlign: 'center' }}>Booking History</h1>
 
             {loading && <div className="loading-overlay">Loading...</div>}

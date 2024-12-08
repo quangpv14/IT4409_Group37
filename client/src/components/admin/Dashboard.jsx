@@ -36,6 +36,6 @@ export const Dashboard = () => {
           {currentTab === 'room-management' && <DashRoomManagement />}
         </Col>
       </Row>
-    </Container>
+    </Container>   
   );
 }

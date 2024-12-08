@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 
 export const Help = () => {
@@ -56,6 +56,9 @@ export const Help = () => {
         ],
     };
 
+    useEffect(() => {
+        window.scrollTo(0, 0); // Cuộn lên đầu trang
+    }, []);
     const handleTabClick = (tab) => {
         setActiveTab(tab);
         setActiveItem(null); // Reset active item when switching tabs
