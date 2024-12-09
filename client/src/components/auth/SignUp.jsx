@@ -59,7 +59,7 @@ export const SignUp = () => {
 
         } catch (error) {
             setSuccessMessage("");
-            setErrorMessage(`Error: Something went wrong, please try again.`);
+            setErrorMessage(error.message ? error.message : `Error: Something went wrong, please try again.`);
         }
         setTimeout(() => {
             setErrorMessage("");

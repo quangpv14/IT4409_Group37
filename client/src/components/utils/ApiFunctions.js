@@ -18,7 +18,14 @@ export const getHearder = () => {
 
 
 /** This function get Available Rooms */
-export async function getAvailableRooms(checkIn, checkOut, roomType) {
+export async function getAvailableRooms(params) {
+    try {
+        const response = await api.get('/api/hotel/findall', { params });
+        return response;
+    } catch (error) {
+        console.log('Not found hotels:', error);
+        throw error;
+    }
 }
 
 /** This function register hotel */
